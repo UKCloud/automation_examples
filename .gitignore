@@ -10,3 +10,6 @@ bin/*
 
 Packer/output*
 Packer/packer_cache/*
+
+chef-provisioning-fog/nodes/*
+chef-provisioning-fog/local-mode-cache/*
