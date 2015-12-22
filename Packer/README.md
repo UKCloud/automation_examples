@@ -13,7 +13,7 @@ packer build centos71.json
 ```
 What this will do is download the CentOS7.1 installation ISO, create a new VM in VMware Workstation and perform an automated installation using the kickstart script in the http directory. Once the installation completes, packer will make an SSH connection to the new VM and run further customisation scripts to install amongst other things, the open-vm-tools package required for VM customisation.
 
-The output from Packer will be a set of files in the `output-cnetos71-vmware-iso` directory. Before these files can be uploaded to vCloud Director, we need to make a single edit to the `centos71.vmx` file. Open the file in a text editor like Notepad and locate the line:
+The output from Packer will be a set of files in the `output-centos71-vmware-iso` directory. Before these files can be uploaded to vCloud Director, we need to make a single edit to the `centos71.vmx` file. Open the file in a text editor like Notepad and locate the line:
 ```
 ethernet0.connectiontype = "nat"
 ```
