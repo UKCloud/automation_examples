@@ -1,0 +1,7 @@
+name 'my_web_app'
+maintainer 'Skyscape Cloud Services'
+maintainer_email 'rcoward@skyscapecloud.com'
+license 'apache2'
+description 'Installs/Configures my_web_app'
+long_description 'Installs/Configures my_web_app'
+version '0.1.0'

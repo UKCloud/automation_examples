@@ -14,4 +14,4 @@ knife[:vcair_username] = "#{ENV['VCAIR_USERNAME']}"
 knife[:vcair_password] = "#{ENV['VCAIR_PASSWORD']}"
 knife[:vcair_org]      = "#{ENV['VCAIR_ORG']}"
 knife[:vcair_net]      = "Jumpbox Network"
-knife[:vcair_show_progress] = true
+# knife[:vcair_show_progress] = true

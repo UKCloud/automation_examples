@@ -6,10 +6,6 @@ with_driver 'fog:Vcair'
 
 num_webservers = 2
 
-with_chef_server "https://api.chef.io/organizations/#{ENV['chef_org_name']}",
-		:client_name => Chef::Config[:node_name],
-		:signing_key_filename => Chef::Config[:client_key]
-
 machine_batch "internal servers" do
 	action :destroy
 

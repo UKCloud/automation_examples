@@ -1,0 +1,7 @@
+name 'my_db_server'
+maintainer 'Skyscape Cloud Services'
+maintainer_email 'rcoward@skyscapecloud.com'
+license 'apache2'
+description 'Installs/Configures my_db_server'
+long_description 'Installs/Configures my_db_server'
+version '0.1.0'

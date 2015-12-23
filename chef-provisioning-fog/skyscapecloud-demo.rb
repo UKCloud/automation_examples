@@ -2,13 +2,9 @@
 
 require 'chef/provisioning'
 
-num_webservers = 2
-
 with_driver 'fog:Vcair'
 
-with_chef_server "https://api.chef.io/organizations/#{ENV['chef_org_name']}",
-		:client_name => Chef::Config[:node_name],
-		:signing_key_filename => Chef::Config[:client_key]
+num_webservers = 2
 
 vcair_opts = {
   bootstrap_options: {
@@ -19,12 +15,11 @@ vcair_opts = {
     ssh_options: {
       password: ENV['VCAIR_SSH_PASSWORD'],
       user_known_hosts_file: '/dev/null',
-
     }
   },
   create_timeout: 600,
   start_timeout: 600,
-  ssh_gateway: "vagrant@#{ENV['JUMPBOX_IPADDRESS']}",
+  ssh_gateway: "#{ENV['VCAIR_SSH_USERNAME']}@#{ENV['JUMPBOX_IPADDRESS']}",
   ssh_options: { 
     :password => ENV['VCAIR_SSH_PASSWORD'],
   }
@@ -32,7 +27,6 @@ vcair_opts = {
 
 machine 'jumpbox01' do
   tag 'jumpbox'
-  # recipe 'apache2'
   machine_options vcair_opts
 end
 
@@ -40,14 +34,14 @@ machine_batch "internal servers" do
 
 	machine 'linuxdb01' do
 	  tag 'dbserver'
-	  # recipe 'postgresql'
+	  role 'dbserver'
 	  machine_options vcair_opts.merge({ memory: '4096', cpus: '2' })
 	end
 
 	1.upto(num_webservers) do |i|
 		machine "linuxweb#{i}" do
 		  tag 'webserver'
-		  # recipe 'postgresql'
+      role 'webserver'
 		  machine_options vcair_opts.merge({ memory: '2048'})
 		end
 	end
