@@ -30,7 +30,7 @@ cookbook_file '/var/www/html/index.php' do
 end
 
 node.default['my_web_app']['db_host'] = '127.0.0.1'
-dbserver = search(:node, "tag:dbserver").first
+dbserver = search(:node, "tags:dbserver").first
 unless dbserver.nil?
 	node.default['my_web_app']['db_host'] = dbserver['ipaddress']
 end 
