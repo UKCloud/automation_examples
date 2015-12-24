@@ -1,0 +1,18 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_zero
+  require_chef_omnibus: true
+
+platforms:
+  - name: centos-7.1
+    driver_config:
+      network:
+      - ["forwarded_port", {guest: 80, host: 80, auto_correct: true}]
+
+suites:
+- name: default
+  run_list: ["recipe[my_web_app::default]"]
+  attributes: { }

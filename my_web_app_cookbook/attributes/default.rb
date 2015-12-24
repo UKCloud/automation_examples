@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: my_web_app
-# Recipe:: db_setup
+# Attributes:: default
 #
 # Copyright 2015 Skyscape Cloud Services
 #
@@ -15,3 +15,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+default['nginx']['default_site_enabled'] = false
+default['php-fpm']['user'] = node['nginx']['user']
+default['php-fpm']['group'] = node['nginx']['group']
+
+default['mysql']['server_root_password'] = 'secret'
+
+default['my_web_app']['db_user'] = 'counter'
+default['my_web_app']['db_password'] = 'secret'
+default['my_web_app']['db_name'] = 'counter'
