@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: my_db_server
-# Recipe:: default
+# Cookbook Name:: my_web_app
+# Recipe:: db_setup
 #
 # Copyright 2015 Skyscape Cloud Services
 #
@@ -15,5 +15,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-log 'Installing Database'

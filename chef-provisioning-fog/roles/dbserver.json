@@ -10,7 +10,7 @@
   },
   "chef_type": "role",
   "run_list": [
-    "recipe[my_db_server]"
+    "recipe[my_web_app::db_setup]"
   ],
   "env_run_lists": {
 
