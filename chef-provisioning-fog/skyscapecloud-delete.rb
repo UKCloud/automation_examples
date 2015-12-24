@@ -9,15 +9,15 @@ num_webservers = 2
 machine_batch "internal servers" do
 	action :destroy
 
-	machine 'linuxdb01' do
-	  tag 'dbserver'
-	end
-
 	1.upto(num_webservers) do |i|
 		machine "linuxweb#{i}" do
 		  tag 'webserver'
 		end
 	end
+end
+
+machine 'linuxdb01' do
+	action :destroy
 end
 
 machine 'jumpbox01' do

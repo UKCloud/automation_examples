@@ -30,14 +30,13 @@ machine 'jumpbox01' do
   machine_options vcair_opts
 end
 
+machine 'linuxdb01' do
+  tag 'dbserver'
+  role 'dbserver'
+  machine_options vcair_opts.merge({ memory: '4096', cpus: '2' })
+end
+
 machine_batch "internal servers" do
-
-	machine 'linuxdb01' do
-	  tag 'dbserver'
-	  role 'dbserver'
-	  machine_options vcair_opts.merge({ memory: '4096', cpus: '2' })
-	end
-
 	1.upto(num_webservers) do |i|
 		machine "linuxweb#{i}" do
 		  tag 'webserver'
