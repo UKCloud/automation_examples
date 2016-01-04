@@ -1,0 +1,18 @@
+{
+  "name": "dbserver",
+  "description": "My Database Server",
+  "json_class": "Chef::Role",
+  "default_attributes": {
+
+  },
+  "override_attributes": {
+
+  },
+  "chef_type": "role",
+  "run_list": [
+    "recipe[my_web_app::db_setup]"
+  ],
+  "env_run_lists": {
+
+  }
+}
