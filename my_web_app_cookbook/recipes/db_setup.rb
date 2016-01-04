@@ -26,8 +26,21 @@ mysql2_chef_gem 'default' do
   action :install
 end
 
+# Allow a custom mysql daemon to access its files.
+service_name = 'counter-app'
+{'mysqld_etc_t'         => "/etc/mysql-#{service_name}(/.*)?",
+ 'mysqld_etc_t'         => "/etc/mysql-#{service_name}/my\.cnf",
+ 'mysqld_log_t'         => "/var/log/mysql-#{service_name}(/.*)?",
+ 'mysqld_db_t'          => "/var/lib/mysql-#{service_name}(/.*)?",
+ 'mysqld_var_run_t'     => "/var/run/mysql-#{service_name}(/.*)?",
+ 'mysqld_initrc_exec_t' => "/etc/rc\.d/init\.d/mysql-#{service_name}"}.each do |sc, f|
+  selinux_policy_fcontext f do
+    secontext sc
+  end
+end
+
 # Install and configure mysql
-mysql_service 'default' do
+mysql_service service_name do
   bind_address '0.0.0.0'
   port '3306'  
   initial_root_password node['mysql']['server_root_password']

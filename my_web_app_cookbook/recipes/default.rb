@@ -27,6 +27,20 @@ include_recipe 'php-fpm'
 # Make sure the php mysql extensions are installed.
 package 'php-mysqlnd'
 
+# Ensure we have SELinux in enforcing mode
+selinux_state "SELinux Enforcing" do
+  action :enforcing
+end
+
+# Allow http servers (nginx/apache) to write to php-fpm socket
+selinux_policy_fcontext '/var/run/php-fpm(.*)?.sock' do
+  secontext 'httpd_var_run_t'
+end
+
+selinux_policy_boolean 'httpd_can_network_connect_db' do
+    value true
+end
+
 # Create a nginx site config file
 template "#{node['nginx']['dir']}/sites-available/my_web_app.conf" do
   source 'my_web_app.conf.erb'
