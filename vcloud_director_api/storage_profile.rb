@@ -22,8 +22,9 @@ end
 
  parsed = XmlSimple.xml_in(response.to_str)
 
- printf("%15s  %8s  %8s  %8s   %s\n", 'Name', 'Used', 'Total', 'Percent', 'VDC')
+ printf("%15s  %8s  %8s  %8s   %s\n", 'Name', 'Used GB', 'Total GB', 'Percent', 'VDC')
  parsed['OrgVdcStorageProfileRecord'].each do |storage|
-	printf("%15s  %8d  %8d  %8.1f%%  %s\n", storage['name'], storage['storageUsedMB'], storage['storageLimitMB'],
+	printf("%15s  %8d  %8d  %8.1f%%  %s\n", storage['name'], (storage['storageUsedMB'].to_f / 1024), 
+		   (storage['storageLimitMB'].to_f / 1024),
 		   (storage['storageUsedMB'].to_f / storage['storageLimitMB'].to_f * 100.0), storage['vdcName']) 	
  end
