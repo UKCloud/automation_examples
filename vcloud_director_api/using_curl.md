@@ -11,7 +11,7 @@ Logging In
 -------
 This command authenticates your user credentials with vCloud Director and returns the authentication token you will need to include in subsequent API calls.
 ```
-> curl -u %VCAIR_USERNAME%@%VCAIR_ORG%:%VCAIR_PASSWORD%  -H "Accept: application/*+xml;version=5.6" -d '' -i https://api.vcd.portal.skyscapecloud.com/api/sessions
+> curl -u %VCAIR_USERNAME%@%VCAIR_ORG%:%VCAIR_PASSWORD%  -H "Accept: application/*+xml;version=5.6" -X POST -i https://api.vcd.portal.skyscapecloud.com/api/sessions
 HTTP/1.1 200 OK
 Date: Wed, 06 Jan 2016 11:19:10 GMT
 X-VMWARE-VCLOUD-REQUEST-ID: abcdefgh-1234-5678-9012-abcdefghijkl
