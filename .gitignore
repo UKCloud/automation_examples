@@ -22,4 +22,5 @@ chef-provisioning-fog/clients/*
 # Ignore community cookbooks deployed by berkshelf
 chef-provisioning-fog/cookbooks/*
 
-
+# Ignore Terraform state files
+terraform/*.tfstate*
