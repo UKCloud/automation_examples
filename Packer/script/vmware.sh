@@ -23,22 +23,25 @@ if [[ $PACKER_BUILDER_TYPE =~ vmware ]]; then
 
     if grep -q -i "release 7" /etc/redhat-release ; then
 
-        cat <<-EOF > /etc/yum.repos.d/vmware-tools.repo
-[vmware-tools]
-name = VMware Tools
-baseurl = http://packages.vmware.com/packages/rhel7/x86_64/
-enabled = 1
-gpgcheck = 1
-EOF
+# From version 9.10.x of open-vm-tools the deploypkg component is included,
+# so this code should not be needed any more.
+#         cat <<-EOF > /etc/yum.repos.d/vmware-tools.repo
+# [vmware-tools]
+# name = VMware Tools
+# baseurl = http://packages.vmware.com/packages/rhel7/x86_64/
+# enabled = 1
+# gpgcheck = 1
+# EOF
 
-        cd /tmp
-        for key in VMWARE-PACKAGING-GPG-DSA-KEY.pub VMWARE-PACKAGING-GPG-RSA-KEY.pub
-        do
-            wget http://packages.vmware.com/tools/keys/${key}
-            rpm --import ${key}
-        done
+#         cd /tmp
+#         for key in VMWARE-PACKAGING-GPG-DSA-KEY.pub VMWARE-PACKAGING-GPG-RSA-KEY.pub
+#         do
+#             wget http://packages.vmware.com/tools/keys/${key}
+#             rpm --import ${key}
+#         done
 
-        yum -y install open-vm-tools open-vm-tools-deploypkg perl net-tools
+        # yum -y install open-vm-tools open-vm-tools-deploypkg perl net-tools
+        yum -y install open-vm-tools perl net-tools
         systemctl restart vmtoolsd
 
         # This is required for the server customisation step to work with CentOS7 installs currently.
@@ -75,5 +78,8 @@ EOF
         echo "==> Removing packages needed for building guest tools"
         yum -y remove gcc cpp libmpc mpfr kernel-devel kernel-headers
     fi
+
+    systemctl disable NetworkManager.service
+    chkconfig network on
 
 fi
