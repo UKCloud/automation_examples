@@ -1,0 +1,5 @@
+source 'https://supermarket.chef.io'
+
+cookbook 'my_web_app', path: '../my_web_app_cookbook'
+cookbook 'chef-client'
+cookbook 'hostnames'

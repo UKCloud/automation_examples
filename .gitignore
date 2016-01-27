@@ -24,3 +24,5 @@ chef-provisioning-fog/cookbooks/*
 
 # Ignore Terraform state files
 terraform/*.tfstate*
+terraform/resources.pdf
+terraform/resources.dot
