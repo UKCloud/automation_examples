@@ -4,7 +4,7 @@ maintainer_email 'rcoward@skyscapecloud.com'
 license          'apache2'
 description      'Installs/Configures my_web_app'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version '0.3.0'
+version '0.4.1'
 
 depends 'database'
 depends 'mysql2_chef_gem', '~> 1.0'
@@ -13,3 +13,4 @@ depends 'nginx'
 depends 'php-fpm'
 depends 'selinux'
 depends 'selinux_policy'
+depends 'haproxy-ng'

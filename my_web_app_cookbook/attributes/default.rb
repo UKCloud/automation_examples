@@ -25,3 +25,17 @@ default['mysql']['server_root_password'] = 'secret'
 default['my_web_app']['db_user'] = 'counter'
 default['my_web_app']['db_password'] = 'secret'
 default['my_web_app']['db_name'] = 'counter'
+
+default['haproxy']['install_method'] = 'package'
+default['haproxy']['tuning'] = [ 'tune.ssl.default-dh-param 2048' ]
+default['haproxy']['config'] = [ 'daemon',
+							    'user haproxy',
+							    'group haproxy',
+							    'pidfile /var/run/haproxy.pid',
+							    'log /dev/log    local0',
+							    'log /dev/log    local1 notice',
+							    'stats socket /var/run/haproxy.sock mode 600 level admin',
+							    'stats timeout 2m',
+							    'chroot /var/lib/haproxy' ]
+
+default['haproxy']['proxies'] = %w( HTTP http counter stats )

@@ -1,0 +1,13 @@
+{
+  "name": "web02",
+  "chef_type": "node",
+  "json_class": "Chef::Node",
+  "chef_environment": "Testing",
+  "run_list": [ "recipe[chef-client]", "recipe[chef-client::config]", "recipe[chef-client::delete_validation]", "recipe[my_web_app]"],
+  "default": {
+    "tags": ["webserver"]
+  },
+  "automatic": {
+    "ipaddress": "10.103.1.52"
+  }
+}

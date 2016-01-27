@@ -26,6 +26,11 @@ mysql2_chef_gem 'default' do
   action :install
 end
 
+package 'policycoreutils-python' do
+  action :install
+end
+
+
 # Allow a custom mysql daemon to access its files.
 service_name = 'counter-app'
 {'mysqld_etc_t'         => "/etc/mysql-#{service_name}(/.*)?",
