@@ -27,6 +27,10 @@ include_recipe 'php-fpm'
 # Make sure the php mysql extensions are installed.
 package 'php-mysqlnd'
 
+package 'policycoreutils-python' do
+  action :install
+end
+
 # Ensure we have SELinux in enforcing mode
 selinux_state "SELinux Enforcing" do
   action :enforcing

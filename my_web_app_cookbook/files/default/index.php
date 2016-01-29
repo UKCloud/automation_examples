@@ -38,6 +38,7 @@ $month = $res->fetch_assoc();
 	This Week: <?php echo $week['week_count'] ?><br>
 	This Month: <?php echo $month['month_count'] ?></td>
 	</tr>
+    <tr><td align="right"><?php echo $_SERVER["SERVER_ADDR"] ?></td></tr>
 	</table>
 </body>
 </html>

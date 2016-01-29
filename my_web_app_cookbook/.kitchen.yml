@@ -5,14 +5,19 @@ driver:
 provisioner:
   name: chef_zero
   require_chef_omnibus: true
+  nodes_path: ./nodes
 
 platforms:
   - name: centos-7.1
     driver_config:
       network:
       - ["forwarded_port", {guest: 80, host: 80, auto_correct: true}]
+      - ["forwarded_port", {guest: 1936, host: 1936, auto_correct: true}]
 
 suites:
 - name: default
   run_list: ["recipe[my_web_app::default]"]
+  attributes: { }
+- name: haproxy
+  run_list: ["recipe[my_web_app::load_balancer]"]
   attributes: { }
