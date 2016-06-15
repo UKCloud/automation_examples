@@ -1,5 +1,5 @@
-variable "OS_TENANT_NAME" { default = "Skyscape-Beta" }
-variable "OS_USERNAME" { default = "rcoward@skyscapecloud.com" }
+variable "OS_TENANT_NAME" {}
+variable "OS_USERNAME" {}
 variable "OS_PASSWORD" {}
 variable "OS_AUTH_URL" { default = "https://beta.openstack.skyscapecloud.com:13000/v2.0" }
 
