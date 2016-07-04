@@ -1,0 +1,94 @@
+heat_template_version: 2015-04-30
+
+parameters:
+  flavor:
+    type: string
+    description: Flavor for the server to be created
+    default: m1.small
+    constraints:
+      - custom_constraint: nova.flavor
+  image:
+    type: string
+    description: Image ID or image name to use for the server
+    default: "Centos7"
+    constraints:
+      - custom_constraint: glance.image
+
+resources:
+  dmz_net:
+    type: OS::Neutron::Net
+    properties:
+      admin_state_up: true
+      name: dmz_net
+
+  dmz_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      network: { get_resource: dmz_net }
+      allocation_pools: [{"start": "192.168.200.20", "end": "192.168.200.200"}]
+      cidr: "192.168.200.0/24"
+      dns_nameservers: ["8.8.8.8"]
+      gateway_ip: "192.168.200.1"
+      ip_version: 4
+
+  InternetGW:
+    type: OS::Neutron::Router
+    properties:
+      external_gateway_info: { network: Internet }
+
+  dmz_gw:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: InternetGW }
+      subnet: { get_resource: dmz_subnet }
+
+  example_key:
+    type: OS::Nova::KeyPair
+    properties:
+      save_private_key: true
+      name: example_key
+
+  haproxy_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 22
+          port_range_max: 22
+
+  haproxy_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: dmz_net }
+      fixed_ips:
+        - subnet_id: { get_resource: dmz_subnet }
+      security_groups:
+        - { get_resource: haproxy_secgroup }
+
+
+  haproxy_server:
+    type: OS::Nova::Server
+    properties:
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_resource: example_key }
+      networks:
+        - port: { get_resource: haproxy_port }
+
+  haproxy_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: "Internet"
+
+  haproxy_ip_assoc:
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+      floatingip_id: { get_resource: haproxy_ip }
+      port_id: { get_resource: haproxy_port }
+
+
+outputs:
+  private_key:
+    description: Private Key
+    value: { get_attr: [ example_key, private_key ]}
