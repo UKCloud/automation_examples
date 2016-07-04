@@ -1,0 +1,2 @@
+resource_registry:  
+  "OS::Nova::Server::Webserver": "web_server.yaml"

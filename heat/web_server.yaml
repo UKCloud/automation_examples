@@ -1,0 +1,61 @@
+heat_template_version: 2014-10-16  
+
+description: A simple web server.  
+
+parameters:
+  flavor:
+    type: string
+    description: Flavor for the server to be created
+    default: t1.small
+    constraints:
+      - custom_constraint: nova.flavor
+  image:
+    type: string
+    description: Image ID or image name to use for the server
+    default: "Centos7"
+    constraints:
+      - custom_constraint: glance.image
+  key_name:
+    type: string
+    description: SSH Key-pair name
+    default: "RobC"
+  net_name:
+    type: string
+    description: Network that the servers are created on
+    default: dmz_net
+
+resources:  
+  http_int_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: 192.168.200.0/24
+          port_range_min: 80
+          port_range_max: 80
+        - protocol: tcp
+          remote_ip_prefix: 192.168.200.0/24
+          port_range_min: 443
+          port_range_max: 443
+
+  ssh_int_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: 192.168.200.0/24
+          port_range_min: 22
+          port_range_max: 22
+
+  server:
+    type: OS::Nova::Server
+    properties:
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_param: key_name }
+      networks:
+        - network: { get_param: net_name }
+      security_groups:
+        - { get_resource: ssh_int_secgroup }
+        - { get_resource: http_int_secgroup }
+
