@@ -4,7 +4,7 @@ parameters:
   flavor:
     type: string
     description: Flavor for the server to be created
-    default: m1.small
+    default: t1.small
     constraints:
       - custom_constraint: nova.flavor
   image:
@@ -35,6 +35,7 @@ resources:
     type: OS::Neutron::Router
     properties:
       external_gateway_info: { network: Internet }
+      name: InternetGW
 
   dmz_gw:
     type: OS::Neutron::RouterInterface
@@ -48,7 +49,7 @@ resources:
       save_private_key: true
       name: example_key
 
-  haproxy_secgroup:
+  ssh_ext_secgroup:
     type: OS::Neutron::SecurityGroup
     properties:
       rules:
@@ -57,6 +58,81 @@ resources:
           port_range_min: 22
           port_range_max: 22
 
+  ssh_int_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: 192.168.200.0/24
+          port_range_min: 22
+          port_range_max: 22
+
+  http_ext_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 80
+          port_range_max: 80
+        - protocol: tcp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 443
+          port_range_max: 443
+
+  http_int_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: 192.168.200.0/24
+          port_range_min: 80
+          port_range_max: 80
+        - protocol: tcp
+          remote_ip_prefix: 192.168.200.0/24
+          port_range_min: 443
+          port_range_max: 443
+
+  mysql_int_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: 192.168.200.0/24
+          port_range_min: 3306
+          port_range_max: 3306
+
+
+  jumpbox_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: dmz_net }
+      fixed_ips:
+        - subnet_id: { get_resource: dmz_subnet }
+      security_groups:
+        - { get_resource: ssh_ext_secgroup }
+
+  jumpbox_server:
+    type: OS::Nova::Server
+    properties:
+      name: jump01
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_resource: example_key }
+      networks:
+        - port: { get_resource: jumpbox_port }
+
+  jumpbox_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: "Internet"
+
+  jumpbox_ip_assoc:
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+      floatingip_id: { get_resource: jumpbox_ip }
+      port_id: { get_resource: jumpbox_port }
+
   haproxy_port:
     type: OS::Neutron::Port
     properties:
@@ -64,12 +140,12 @@ resources:
       fixed_ips:
         - subnet_id: { get_resource: dmz_subnet }
       security_groups:
-        - { get_resource: haproxy_secgroup }
-
+        - { get_resource: http_ext_secgroup }
 
   haproxy_server:
     type: OS::Nova::Server
     properties:
+      name: haproxy01
       flavor: { get_param: flavor }
       image: { get_param: image }
       key_name: { get_resource: example_key }
@@ -87,6 +163,52 @@ resources:
       floatingip_id: { get_resource: haproxy_ip }
       port_id: { get_resource: haproxy_port }
 
+  web_server_1:
+    type: OS::Nova::Server
+    properties:
+      name: web01
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_resource: example_key }
+      networks:
+        - network: { get_resource: dmz_net }
+      security_groups:
+        - { get_resource: ssh_int_secgroup }
+        - { get_resource: http_int_secgroup }
+
+  web_server_2:
+    type: OS::Nova::Server
+    properties:
+      name: web02
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_resource: example_key }
+      networks:
+        - network: { get_resource: dmz_net }
+      security_groups:
+        - { get_resource: ssh_int_secgroup }
+        - { get_resource: http_int_secgroup }
+
+  db_sys_volume:
+    type: OS::Cinder::Volume
+    properties:
+      size: 50
+      image: { get_param: image }
+
+  database_server:
+    type: OS::Nova::Server
+    properties:
+      name: db01
+      flavor: { get_param: flavor }
+      networks:
+        - network: { get_resource: dmz_net }
+      security_groups:
+        - { get_resource: ssh_int_secgroup }
+        - { get_resource: mysql_int_secgroup }
+      block_device_mapping:
+        - device_name: vda
+          volume_id: { get_resource: db_sys_volume }
+          delete_on_termination: true
 
 outputs:
   private_key:
