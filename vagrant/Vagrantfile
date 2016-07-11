@@ -1,0 +1,78 @@
+precise32_vm_box_url = 'http://vagrant.tsugliani.fr/precise32.box'
+centos72_box = 'c:\Users\rcoward\Documents\github\VM-Images\Linux\CentOS72_vmware_ovf.box'
+
+vapp = {
+  name: 'My vApp name',
+  org_name: ENV['VCLOUD_ORG'],
+  orgvdc_name: ENV['VCLOUD_VDC'],
+  orgvdccatalog_name: 'DevOps',
+  metadata: [ [ 'key', 'value' ] ],
+  auto_yes_for_upload: true,
+  advanced_networking: false,
+  networks: {
+    org: [ 'Development Network' ],
+    vapp: [
+      {
+        name: 'MyNetwork',
+        ip_subnet: '10.10.10.10/255.255.255.0'
+      }
+    ]
+  }
+}
+
+nodes = [
+  { :hostname => 'web-vm',
+    :box => 'centos72',
+    :box_url => centos72_box },
+  { :hostname => 'sql-vm',
+    :box => 'centos72',
+    :box_url => centos72_box }
+]
+
+Vagrant.configure('2') do |config|
+
+  # vCloud Director provider settings
+  config.vm.provider :vcloud do |vcloud|
+    vcloud.hostname = 'https://api.vcd.portal.skyscapecloud.com'
+    vcloud.username = ENV['VCLOUD_USERNAME']
+    vcloud.password = ENV['VCLOUD_PASSWORD']
+
+    vcloud.org_name = vapp[:org_name]
+    vcloud.vdc_name = vapp[:orgvdc_name]
+    vcloud.catalog_name = vapp[:orgvdccatalog_name]
+
+    vcloud.vapp_prefix = 'dev-sandbox'
+
+    # vcloud.vapp_name = vapp[:name]
+    # vcloud.metadata_vapp = vapp[:metadata]
+    # vcloud.auto_yes_for_upload = vapp[:auto_yes_for_upload]
+
+    # vcloud.advanced_network = vapp[:advanced_networking]
+    if vapp[:advanced_networking]
+      vcloud.networks = vapp[:networks]
+    else
+      vcloud.ip_subnet = '172.16.32.125/255.255.255.240'
+      vcloud.ip_dns = ['8.8.8.8']  # optional
+    # Set the Organization Network where we will attach our vApp to
+      vcloud.vdc_network_name = 'Development Network'
+    # Set the Organization Edge Gateway parameters.
+      vcloud.vdc_edge_gateway = 'nft002aci2-8445a3'
+      vcloud.vdc_edge_gateway_ip = '51.179.193.252'
+      end
+
+  end
+
+  nodes.each do |node|
+    config.vm.define node[:hostname] do |node_config|
+      node_config.vm.box = node[:box]
+      node_config.vm.hostname = node[:hostname]
+      node_config.vm.box_url = node[:box_url]
+      node_config.vm.network :forwarded_port,
+                             guest: 80,
+                             host: 8080,
+                             auto_correct: true
+      node_config.ssh.username = "packer"
+      node_config.ssh.private_key_path = "C:\\Users\\rcoward\\Documents\\github\\VM-Images\\Linux\\packer.pem"                    
+    end
+  end
+end
