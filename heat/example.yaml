@@ -192,8 +192,13 @@ resources:
   db_sys_volume:
     type: OS::Cinder::Volume
     properties:
-      size: 50
+      size: 30
       image: { get_param: image }
+
+  db_data_volume:
+    type: OS::Cinder::Volume
+    properties:
+      size: 50
 
   database_server:
     type: OS::Nova::Server
@@ -208,6 +213,9 @@ resources:
       block_device_mapping:
         - device_name: vda
           volume_id: { get_resource: db_sys_volume }
+          delete_on_termination: true
+        - device_name: vdb
+          volume_id: { get_resource: db_data_volume }
           delete_on_termination: true
 
 outputs:
