@@ -1,0 +1,206 @@
+heat_template_version: 2015-10-15
+
+parameters:
+  key_name:
+    type: string
+    description: SSH Key Pair
+    constraints:
+      - custom_constraint: nova.keypair
+  pfsense_flavor:
+    type: string
+    description: Flavor for the server to be created
+    default: t1.tiny
+    constraints:
+      - custom_constraint: nova.flavor
+  pfsense_image:
+    type: string
+    description: Image ID or image name to use for the server
+    default: "pfSense 2.3.1 Appliance"
+    constraints:
+      - custom_constraint: glance.image
+  jumpbox_flavor:
+    type: string
+    description: Flavor for the server to be created
+    default: t1.medium
+    constraints:
+      - custom_constraint: nova.flavor
+  jumpbox_image:
+    type: string
+    description: Image ID or image name to use for the server
+    default: "Centos7"
+    constraints:
+      - custom_constraint: glance.image
+  protected_net_cidr:
+    type: string
+    description: CIDR Network address for the protected network
+    default: "192.168.1.0/24"
+
+resources:
+  dmz_net:
+    type: OS::Neutron::Net
+    properties:
+      admin_state_up: true
+      name: dmz_net
+
+  dmz_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      network: { get_resource: dmz_net }
+      allocation_pools: [{"start": "172.16.1.20", "end": "172.16.1.200"}]
+      cidr: "172.16.1.0/24"
+      dns_nameservers: ["8.8.8.8"]
+      gateway_ip: "172.16.1.1"
+      ip_version: 4
+
+  InternetGW:
+    type: OS::Neutron::Router
+    properties:
+      external_gateway_info: { network: Internet }
+      name: InternetGW
+
+  dmz_gw:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: InternetGW }
+      subnet: { get_resource: dmz_subnet }
+
+  protected_net:
+    type: OS::Neutron::Net
+    properties:
+      admin_state_up: true
+      name: protected_net
+
+  protected_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      network: { get_resource: protected_net }
+      allocation_pools: [{"start": "192.168.1.20", "end": "192.168.1.200"}]
+      cidr: { get_param: protected_net_cidr }
+      dns_nameservers: ["8.8.8.8"]
+      gateway_ip: "192.168.1.1"
+      ip_version: 4
+
+  pfsense_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: { get_param: protected_net_cidr }
+          port_range_min: 22
+          port_range_max: 22
+        - protocol: tcp
+          remote_ip_prefix: { get_param: protected_net_cidr }
+          port_range_min: 80
+          port_range_max: 80
+        - protocol: tcp
+          remote_ip_prefix: { get_param: protected_net_cidr }
+          port_range_min: 443
+          port_range_max: 443
+        - protocol: icmp
+          remote_ip_prefix: 0.0.0.0/0
+
+  pfsense_ext_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: dmz_net }
+      fixed_ips:
+        - subnet_id: { get_resource: dmz_subnet }
+      security_groups:
+        - { get_resource: pfsense_secgroup }
+
+  pfsense_int_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: protected_net }
+      fixed_ips:
+        - ip_address: "192.168.1.1"
+      security_groups:
+        - { get_resource: pfsense_secgroup }
+
+  pfsense_server:
+    type: OS::Nova::Server
+    properties:
+      name: firewall01
+      flavor: { get_param: pfsense_flavor }
+      image: { get_param: pfsense_image }
+      key_name: { get_param: key_name }
+      networks:
+        - port: { get_resource: pfsense_ext_port }
+        - port: { get_resource: pfsense_int_port }
+
+  pfsense_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: "Internet"
+
+  pfsense_ip_assoc:
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+      floatingip_id: { get_resource: pfsense_ip }
+      port_id: { get_resource: pfsense_ext_port }
+
+  jumpbox_server:
+    type: OS::Nova::Server
+    properties:
+      name: jump01
+      flavor: { get_param: jumpbox_flavor }
+      image: { get_param: jumpbox_image }
+      key_name: { get_param: key_name }
+      networks:
+        - port: { get_resource: jumpbox_ext_port }
+        - network: { get_resource: protected_net }
+      user_data:  |
+        #!/bin/bash
+        cat > /etc/sysconfig/network-scripts/ifcfg-eth1 <<-EOF
+        DEVICE="eth1"
+        BOOTPROTO="dhcp"
+        ONBOOT="yes"
+        TYPE="Ethernet"
+        IPV6INIT="no"
+        DEFROUTE="no"
+        EOF
+        ifup eth1
+
+
+  jumpbox_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 3389
+          port_range_max: 3389
+        - protocol: tcp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 22
+          port_range_max: 22
+        - protocol: icmp
+          remote_ip_prefix: 0.0.0.0/0
+
+  jumpbox_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: "Internet"
+
+  jumpbox_ext_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: dmz_net }
+      fixed_ips:
+        - subnet_id: { get_resource: dmz_subnet }
+      security_groups:
+        - { get_resource: jumpbox_secgroup }
+
+  jumpbox_ip_assoc:
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+      floatingip_id: { get_resource: jumpbox_ip }
+      port_id: { get_resource: jumpbox_ext_port }
+
+outputs:
+  jumpbox_ip:
+    description: IP Address of the deployed Jumpbox instance
+    value: { get_attr: [ jumpbox_ip, floating_ip_address ]}
+  firewall_ip:
+    description: IP Address of the deployed Firewall / VPN instance
+    value: { get_attr: [ pfsense_ip, floating_ip_address ]}
