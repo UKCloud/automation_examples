@@ -10,7 +10,7 @@ parameters:
   image:
     type: string
     description: Image ID or image name to use for the server
-    default: "Centos7"
+    default: "CentOS 7"
     constraints:
       - custom_constraint: glance.image
 

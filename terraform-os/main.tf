@@ -177,9 +177,16 @@ resource "openstack_compute_instance_v2" "web" {
   count = 2
 }
 
-resource "openstack_blockstorage_volume_v1" "database" {
+resource "openstack_blockstorage_volume_v1" "db_system" {
+  name = "db_system"
+  size = 30
+  image_id = "${var.IMAGE_ID}"
+  description = "System volume for MySQL"
+}
+
+resource "openstack_blockstorage_volume_v1" "db_data" {
   region = ""
-  name = "database-volume"
+  name = "db_data"
   description = "data volume for MySQL"
   size = 50
 }
@@ -192,16 +199,16 @@ resource "openstack_compute_instance_v2" "database" {
                      "${openstack_networking_secgroup_v2.local_mysql.name}"]
 
   block_device {
-    uuid = "${var.IMAGE_ID}"
-    source_type = "image"
-    volume_size = 30
+    uuid = "${openstack_blockstorage_volume_v1.db_system.id}"
+    source_type = "volume"
     boot_index = 0
+    volume_size = "${openstack_blockstorage_volume_v1.db_system.size}"
     destination_type = "volume"
     delete_on_termination = true
   }
 
   volume {
-    volume_id = "${openstack_blockstorage_volume_v1.database.id}"
+    volume_id = "${openstack_blockstorage_volume_v1.db_data.id}"
   }
 
   network {
