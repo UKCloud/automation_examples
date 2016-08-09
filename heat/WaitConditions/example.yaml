@@ -1,0 +1,46 @@
+heat_template_version: 2015-04-30
+
+parameters:
+  flavor:
+    type: string
+    description: Flavor for the server to be created
+    default: t1.small
+    constraints:
+      - custom_constraint: nova.flavor
+  image:
+    type: string
+    description: Image ID or image name to use for the server
+    default: "CentOS 7.2"
+    constraints:
+      - custom_constraint: glance.image
+  timeout:
+    type: number
+    description: Timeout for WaitCondition, depends on your image and environment
+    default: 300
+  vm_network:
+    type: string
+    description: Network name to use for the server
+    default: "Internal"
+    constraints:
+      - custom_constraint: nova.network
+
+resources:
+  example_key:
+    type: OS::Nova::KeyPair
+    properties:
+      save_private_key: true
+      name: example_key
+
+  demo_host:
+    type: Demo::Server
+    properties:
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      timeout: { get_param: timeout }
+      vm_network: { get_param: vm_network }
+      ssh_key: { get_resource: example_key }
+
+
+outputs:
+  host_ip:
+    value: { get_attr: ['demo_host', 'ipaddress'] }

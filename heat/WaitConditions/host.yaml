@@ -1,0 +1,120 @@
+heat_template_version: 2015-04-30
+
+parameters:
+  flavor:
+    type: string
+    description: Flavor for the server to be created
+    default: t1.small
+    constraints:
+      - custom_constraint: nova.flavor
+  image:
+    type: string
+    description: Image ID or image name to use for the server
+    default: "CentOS 7.2"
+    constraints:
+      - custom_constraint: glance.image
+  timeout:
+    type: number
+    description: Timeout for WaitCondition, depends on your image and environment
+    default: 300
+  vm_network:
+    type: string
+    description: Network name to use for the server
+    default: "Internal"
+    constraints:
+      - custom_constraint: nova.network
+  ssh_key:
+    type: string
+    description: SSH Key Pair to use with the vm_network
+  hostname:
+    type: string
+    description: hostname
+    default: "testhost01"
+  domain_name:
+    type: string
+    description: domain name
+    default: "example.com"
+
+resources:
+  ssh_ext_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      rules:
+        - protocol: tcp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 22
+          port_range_max: 22
+
+  wait_handle:
+    type: OS::Heat::WaitConditionHandle
+
+  wait_condition:
+    type: OS::Heat::WaitCondition
+    properties:
+      handle: {get_resource: wait_handle}
+      # Note, count of 5 vs 6 is due to duplicate signal ID 5 sent below
+      count: 5
+      timeout: {get_param: timeout}
+
+  test_server:
+    type: OS::Nova::Server
+    properties:
+      name: test01
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_param: ssh_key }
+      networks:
+        - network: { get_param: vm_network }
+      user_data_format: SOFTWARE_CONFIG
+      user_data: {get_resource: init}
+
+  init:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: {get_resource: set_hostname}
+      - config: {get_resource: included_files}
+      - config: {get_resource: init_script}
+        type: multipart
+
+  # Compose the FQDN for cloud-init
+  set_hostname:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        hostname: {get_param: hostname}
+        fqdn:
+          str_replace:
+            template: "HOST.DOMAIN"
+            params:
+              HOST: {get_param: hostname}
+              DOMAIN: {get_param: domain_name}
+
+  included_files:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        write_files:
+        - path: /etc/motd
+          permissions: 0644
+          content: {get_file: files/motd}
+
+  init_script:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: script
+      config:
+        str_replace:
+          params:
+            $WC_NOTIFY: { get_attr: ['wait_handle', 'curl_cli'] }
+          template: {get_file: files/initscript}
+
+
+
+outputs:
+  host_ip:
+    value: { get_attr: ['wait_handle', 'curl_cli'] }
+  wc_data:
+    value: { get_attr: ['wait_condition', 'data'] }
+  ipaddress:
+    value: { get_attr: [test_server, first_address] }

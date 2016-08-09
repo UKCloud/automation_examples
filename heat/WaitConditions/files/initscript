@@ -1,0 +1,19 @@
+#!/bin/sh
+# Below are some examples of the various ways signals
+# can be sent to the Handle resource
+# Simple success signal
+$WC_NOTIFY --data-binary '{"status": "SUCCESS"}'
+# Or you optionally can specify any of the additional fields
+$WC_NOTIFY --data-binary '{"status": "SUCCESS", "reason": "signal2"}'
+$WC_NOTIFY --data-binary '{"status": "SUCCESS", "reason": "signal3", "data": "data3"}'
+$WC_NOTIFY --data-binary '{"status": "SUCCESS", "reason": "signal4", "data": "data4"}'
+# If you require control of the ID, you can pass it.
+# The ID should be unique, unless you intend for duplicate
+# signals to overrite each other.  The following two calls
+# do the exact same thing, and will be treated as one signal
+# (You can prove this by changing count above to 7)
+$WC_NOTIFY --data-binary '{"status": "SUCCESS", "id": "5"}'
+$WC_NOTIFY --data-binary '{"status": "SUCCESS", "id": "5"}'
+# Example of sending a failure signal, optionally
+# reason, id, and data can be specified as above
+# wc_notify --data-binary '{"status": "FAILURE"}'

@@ -1,0 +1,2 @@
+resource_registry:  
+  "Demo::Server": "host.yaml"
