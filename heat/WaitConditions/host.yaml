@@ -65,6 +65,8 @@ resources:
       key_name: { get_param: ssh_key }
       networks:
         - network: { get_param: vm_network }
+      security_groups:
+        - { get_resource: ssh_ext_secgroup }
       user_data_format: SOFTWARE_CONFIG
       user_data: {get_resource: init}
 
