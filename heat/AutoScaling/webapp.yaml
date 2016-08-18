@@ -21,6 +21,14 @@ resources:
       cooldown: 60
       scaling_adjustment: 1
 
+  scaledown_policy:
+    type: OS::Heat::ScalingPolicy
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: { get_resource: group }
+      cooldown: 60
+      scaling_adjustment: -1
+
   cpu_alarm_high:
     type: OS::Ceilometer::Alarm
     properties:
@@ -32,3 +40,15 @@ resources:
       alarm_actions:
         - {get_attr: [scaleup_policy, alarm_url]}
       comparison_operator: gt
+
+  cpu_alarm_low:
+    type: OS::Ceilometer::Alarm
+    properties:
+      meter_name: cpu_util
+      statistic: avg
+      period: 60
+      evaluation_periods: 1
+      threshold: 10
+      alarm_actions:
+        - {get_attr: [scaledown_policy, alarm_url]}
+      comparison_operator: lt

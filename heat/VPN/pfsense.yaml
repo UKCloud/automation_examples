@@ -77,8 +77,27 @@ resources:
       allocation_pools: [{"start": "192.168.1.20", "end": "192.168.1.200"}]
       cidr: { get_param: protected_net_cidr }
       dns_nameservers: ["8.8.8.8"]
-      gateway_ip: "192.168.1.1"
+      gateway_ip: ""
       ip_version: 4
+      host_routes: [{"destination": "169.254.169.254", "nexthop": "192.168.1.254"}, {"destination": "0.0.0.0", "nexthop": "192.168.1.1"}]
+
+  MetadataGW:
+    type: OS::Neutron::Router
+    properties:
+      name: MetadataGW
+
+  Metadata_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_resource: protected_net }
+      fixed_ips:
+        - ip_address: "192.168.1.254"
+
+  protected_gw:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: MetadataGW }
+      port: { get_resource: Metadata_port }
 
   pfsense_secgroup:
     type: OS::Neutron::SecurityGroup
@@ -117,16 +136,25 @@ resources:
       security_groups:
         - { get_resource: pfsense_secgroup }
 
+  pfsense_volume:
+    type: OS::Cinder::Volume
+    properties:
+      size: 20
+      image: { get_param: pfsense_image }
+
   pfsense_server:
     type: OS::Nova::Server
     properties:
       name: firewall01
       flavor: { get_param: pfsense_flavor }
-      image: { get_param: pfsense_image }
       key_name: { get_param: key_name }
       networks:
         - port: { get_resource: pfsense_ext_port }
         - port: { get_resource: pfsense_int_port }
+      block_device_mapping:
+        - device_name: vda
+          volume_id: { get_resource: pfsense_volume }
+          delete_on_termination: true
 
   pfsense_ip:
     type: OS::Neutron::FloatingIP

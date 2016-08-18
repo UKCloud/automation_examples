@@ -6,7 +6,7 @@ parameters:
   flavor:
     type: string
     description: Flavor for the server to be created
-    default: t1.small
+    default: t1.tiny
     constraints:
       - custom_constraint: nova.flavor
   image:
