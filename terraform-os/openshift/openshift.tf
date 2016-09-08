@@ -10,6 +10,12 @@ data "template_file" "ansible_hosts" {
     domain_name = "${var.domain_name}"
     etcd_ipaddress = "${join("\n", openstack_compute_instance_v2.etcd.*.name)}"
     loadbalancer_ipaddress = "${openstack_compute_instance_v2.loadbalancer.name}"
+    OS_AUTH_URL = "${lookup(var.OS_AUTH_URL, var.PLATFORM)}"
+    OS_USERNAME = "${var.OS_USERNAME}"
+    OS_PASSWORD = "${var.OS_PASSWORD}"
+    OS_TENANT_ID = "${var.OS_TENANT_ID}"
+    OS_TENANT_NAME = "${var.OS_TENANT_NAME}"
+    OS_REGION = "${var.OS_REGION}"
   }
 }
 
@@ -19,6 +25,7 @@ resource "null_resource" "deploy_openshift" {
   # Changes to any instance of the cluster requires re-provisioning
   triggers {
     cluster_instance_ids = "${join(",", openstack_compute_instance_v2.master.*.id)},${join(",", openstack_compute_instance_v2.node.*.id)},${join(",", openstack_compute_instance_v2.etcd.*.id)},${openstack_compute_instance_v2.loadbalancer.id},${openstack_compute_instance_v2.infra_host.id}"
+    openshift_config = "${data.template_file.ansible_hosts.rendered}"
   }
 
 

@@ -43,9 +43,11 @@ resource "openstack_compute_instance_v2" "infra_host" {
 
   provisioner "remote-exec" {
     inline = [
+      "sudo sed -i 's/PEERDNS=.*/PEERDNS=no/' /etc/sysconfig/network-scripts/ifcfg-eth0",
       "sudo cp ~centos/.ssh/authorized_keys /root/.ssh",
       "sudo chmod -R go-rwx /root/.ssh",
       "echo 'nameserver 8.8.8.8' > /tmp/resolv.conf",
+      "echo 'search ${var.domain_name}' >> /tmp/resolv.conf",
       "sudo mv /etc/resolv.conf /etc/resolv.conf.orig",
       "sudo cp /tmp/resolv.conf /etc/resolv.conf",
       "sudo yum -y install epel-release yum-plugin-priorities",

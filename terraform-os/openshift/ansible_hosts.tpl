@@ -16,7 +16,9 @@ ansible_ssh_user=root
 deployment_type=origin
 
 # uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
-#openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+# Defining htpasswd users
+openshift_master_htpasswd_users={'admin': '$apr1$ZG/Jv4JT$XUQ3.aZ4DlGI.fIDnva.s.'}
 
 # Native high availbility cluster method with optional load balancer.
 # If no lb group is defined installer assumes that a load balancer has
@@ -28,6 +30,25 @@ openshift_master_cluster_method=native
 openshift_master_cluster_hostname=openshift.${domain_name}
 openshift_master_cluster_public_hostname=openshift.${domain_name}
 openshift_master_default_subdomain=apps.${domain_name}
+
+# Cloud Provider Configuration
+#
+# Note: You may make use of environment variables rather than store
+# sensitive configuration within the ansible inventory.
+# For example:
+#openshift_cloudprovider_openstack_username="{{ lookup('env','OS_USERNAME') }}"
+#openshift_cloudprovider_openstack_password="{{ lookup('env','OS_PASSWORD') }}"
+#
+# Openstack
+openshift_cloudprovider_kind=openstack
+openshift_cloudprovider_openstack_auth_url=${OS_AUTH_URL}
+openshift_cloudprovider_openstack_username=${OS_USERNAME}
+openshift_cloudprovider_openstack_password=${OS_PASSWORD}
+openshift_cloudprovider_openstack_tenant_id=${OS_TENANT_ID}
+openshift_cloudprovider_openstack_tenant_name=${OS_TENANT_NAME}
+openshift_cloudprovider_openstack_region=${OS_REGION}
+#openshift_cloudprovider_openstack_lb_subnet_id=subnet_id
+
 
 # host group for masters
 [masters]

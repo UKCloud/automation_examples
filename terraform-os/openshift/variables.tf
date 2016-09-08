@@ -1,6 +1,8 @@
 variable "OS_TENANT_NAME" {}
+variable "OS_TENANT_ID" {}
 variable "OS_USERNAME" {}
 variable "OS_PASSWORD" {}
+variable "OS_REGION" { default = "regionOne" }
 variable "OS_AUTH_URL" { 
 	type = "map"
 	default = {
