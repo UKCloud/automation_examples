@@ -33,7 +33,6 @@ resource "openstack_compute_instance_v2" "master" {
     inline = [
       "sudo cp ~centos/.ssh/authorized_keys /root/.ssh",
       "sudo chmod -R go-rwx /root/.ssh",
-      "echo SuperSecret | sudo passwd centos --stdin",
       "sudo yum update -y --exclude=kernel",
       "sudo yum install -y NetworkManager epel-release",
       "sudo systemctl enable NetworkManager.service",
