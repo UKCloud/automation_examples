@@ -46,6 +46,7 @@ variable "Management_Subnet" { default = "192.168.1.0/24" }
 variable "openshift_masters" { default = "3" }
 variable "openshift_nodes" { default = "3" }
 variable "openshift_etcd" { default = "3" }
+variable "openshift_loadbalancer" { default = "1" }
 
 variable "domain_name" { default = "example.com" }
 variable "apps_domain_name" { default = "apps.example.com" }

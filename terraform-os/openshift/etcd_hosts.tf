@@ -1,7 +1,7 @@
-resource "openstack_compute_servergroup_v2" "etcd" {
-  name = "etcd-servergroup"
-  policies = ["anti-affinity"]
-}
+#resource "openstack_compute_servergroup_v2" "etcd" {
+#  name = "etcd-servergroup"
+#  policies = ["anti-affinity"]
+#}
 
 resource "openstack_compute_instance_v2" "etcd" {
   name        = "${format("etcd%02d", count.index + 1)}.${var.domain_name}"
@@ -12,7 +12,7 @@ resource "openstack_compute_instance_v2" "etcd" {
                      "${openstack_networking_secgroup_v2.openshift_network.name}"]
 
   depends_on = [ "openstack_compute_instance_v2.infra_host" ]
-  scheduler_hints = { group = "${openstack_compute_servergroup_v2.etcd.id}" }
+  #scheduler_hints = { group = "${openstack_compute_servergroup_v2.etcd.id}" }
 
   network {
     name = "${openstack_networking_network_v2.openshift.name}"

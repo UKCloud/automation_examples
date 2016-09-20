@@ -1,7 +1,7 @@
-resource "openstack_compute_servergroup_v2" "master" {
-  name = "master-servergroup"
-  policies = ["anti-affinity"]
-}
+#resource "openstack_compute_servergroup_v2" "master" {
+#  name = "master-servergroup"
+#  policies = ["anti-affinity"]
+#}
 
 resource "openstack_compute_instance_v2" "master" {
   name        = "${format("master%02d", count.index + 1)}.${var.domain_name}"
@@ -14,7 +14,7 @@ resource "openstack_compute_instance_v2" "master" {
                      "${openstack_networking_secgroup_v2.any_http.name}"]
 
   depends_on = [ "openstack_compute_instance_v2.infra_host" ]
-  scheduler_hints = { group = "${openstack_compute_servergroup_v2.master.id}" }
+  #scheduler_hints = { group = "${openstack_compute_servergroup_v2.master.id}" }
 
   network {
     name = "${openstack_networking_network_v2.openshift.name}"
@@ -58,6 +58,7 @@ resource "openstack_compute_instance_v2" "loadbalancer" {
                      "${openstack_networking_secgroup_v2.openshift_endpoints.name}"]
 
   depends_on = [ "openstack_compute_instance_v2.infra_host" ]
+  count = "${var.openshift_loadbalancer}"
 
   network {
     name = "${openstack_networking_network_v2.openshift.name}"
