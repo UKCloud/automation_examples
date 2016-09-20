@@ -17,6 +17,7 @@ variable "OS_INTERNET_ID" {
 	default = {
 		production = "893a5b59-081a-4e3a-ac50-1e54e262c3fa"
 		beta = "1fa82a9d-d87d-4b43-b6dd-54bcbef184d3" 
+		preprod = "79078955-d9cd-4d77-aeb3-acd9c586e37c"
 	}
 }
 
@@ -25,6 +26,7 @@ variable "OS_INTERNET_NAME" {
 	default = {
 		production = "internet"
 		beta = "Internet" 
+		preprod = "External"
 	}
 }
 
