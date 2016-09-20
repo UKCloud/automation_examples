@@ -8,6 +8,7 @@ variable "OS_AUTH_URL" {
 	default = {
 		production = "https://cor00005.cni.ukcloud.com:13000/v2.0"
 		beta = "https://beta.openstack.skyscapecloud.com:13000/v2.0"
+		preprod = "http://144.76.175.39:5000/v2.0"
 	}
 }
 
