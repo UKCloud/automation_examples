@@ -1,13 +1,15 @@
 # Now all the servers are up, lets use ansible to deploy openshift
 
 data "template_file" "ansible_hosts" {
-  template = "${file("ansible_hosts.tpl")}"
+  template = "${file(var.ansible_hosts_file)}"
 
   vars {
     master_ipaddress = "${join("\n", openstack_compute_instance_v2.master.*.name)}"
-    master_nodes = "${join("\n", formatlist("%s openshift_node_labels=\"{'region': 'infra', 'zone': 'default', 'router': 'router'}\"", openstack_compute_instance_v2.master.*.name))}"
+    master_nodes = "${join("\n", formatlist("%s openshift_hostname=%s openshift_node_labels=\"{'region': 'infra', 'zone': 'default', 'router': 'router'}\" openshift_schedulable=true", openstack_compute_instance_v2.master.*.name, openstack_compute_instance_v2.master.*.name))}"
     compute_nodes = "${join("\n", formatlist("%s openshift_node_labels=\"{'region': '%s', 'zone': '%s'}\"", openstack_compute_instance_v2.node.*.name, "cor0005", "nova"))}"
+    cluster_hostname = "${var.cluster_hostname}"
     domain_name = "${var.domain_name}"
+    app_subdomain = "${var.app_subdomain}"
     etcd_ipaddress = "${join("\n", openstack_compute_instance_v2.etcd.*.name)}"
     loadbalancer_ipaddress = "${join("\n", concat(openstack_compute_instance_v2.loadbalancer.*.name, list("")))}"
     OS_AUTH_URL = "${lookup(var.OS_AUTH_URL, var.PLATFORM)}"
@@ -37,6 +39,8 @@ data "template_file" "dns_entries" {
 							openstack_compute_instance_v2.node.*.access_ip_v4,
 							openstack_compute_instance_v2.etcd.*.access_ip_v4,
 							openstack_compute_instance_v2.loadbalancer.*.access_ip_v4)))}"		
+                cluster_fqdn     = "${var.cluster_hostname}.${var.domain_name}"
+                cluster_address  = "${element(concat(openstack_compute_instance_v2.loadbalancer.*.access_ip_v4, openstack_compute_instance_v2.master.*.access_ip_v4), 0)}"
 	}
 }
 

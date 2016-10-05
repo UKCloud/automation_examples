@@ -48,10 +48,14 @@ variable "openshift_nodes" { default = "3" }
 variable "openshift_etcd" { default = "3" }
 variable "openshift_loadbalancer" { default = "1" }
 
+variable "cluster_hostname" { default = "openshift" }
 variable "domain_name" { default = "example.com" }
+variable "app_subdomain" { default = "apps" }
 variable "apps_domain_name" { default = "apps.example.com" }
 variable "public_key_file" { default = "~/.ssh/user.pub" }
 variable "private_key_file" { default = "~/.ssh/user.private" }
 
 variable "mysql_powerdns_password" { default = "VerySecret" }
 variable "powerdns_api_key" { default = "YouWontGuessThis" }
+variable "ansible_hosts_file" { default = "ansible_hosts.tpl" }
+

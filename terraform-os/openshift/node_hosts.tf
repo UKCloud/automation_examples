@@ -3,6 +3,16 @@
 #  policies = ["anti-affinity"]
 #}
 
+data "template_file" "node_config" {
+  template = "${file("init.tpl")}"
+  count = "${var.openshift_nodes}"
+
+  vars {
+    hostname = "${format("node%02d", count.index + 1)}"
+    fqdn     = "${format("node%02d", count.index + 1)}.${var.domain_name}"
+  }
+}
+
 resource "openstack_compute_instance_v2" "node" {
   name        = "${format("node%02d", count.index + 1)}.${var.domain_name}"
   image_name  = "${var.IMAGE_NAME}"
@@ -10,6 +20,8 @@ resource "openstack_compute_instance_v2" "node" {
   key_pair    = "${openstack_compute_keypair_v2.ssh-keypair.name}"
   security_groups = ["${openstack_networking_secgroup_v2.local_ssh.name}",
                      "${openstack_networking_secgroup_v2.openshift_network.name}"]
+
+  user_data = "${element(data.template_file.node_config.*.rendered, count.index)}"
 
   depends_on = [ "openstack_compute_instance_v2.infra_host" ]
   #scheduler_hints = { group = "${openstack_compute_servergroup_v2.node.id}" }

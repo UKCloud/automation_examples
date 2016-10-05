@@ -3,6 +3,16 @@
 #  policies = ["anti-affinity"]
 #}
 
+data "template_file" "master_config" {
+  template = "${file("init.tpl")}"
+  count = "${var.openshift_masters}"
+
+  vars {
+    hostname = "${format("master%02d", count.index + 1)}"
+    fqdn     = "${format("master%02d", count.index + 1)}.${var.domain_name}"
+  }
+}
+
 resource "openstack_compute_instance_v2" "master" {
   name        = "${format("master%02d", count.index + 1)}.${var.domain_name}"
   image_name  = "${var.IMAGE_NAME}"
@@ -12,6 +22,8 @@ resource "openstack_compute_instance_v2" "master" {
                      "${openstack_networking_secgroup_v2.openshift_network.name}",
                      "${openstack_networking_secgroup_v2.openshift_endpoints.name}",
                      "${openstack_networking_secgroup_v2.any_http.name}"]
+
+  user_data = "${element(data.template_file.master_config.*.rendered, count.index)}"
 
   depends_on = [ "openstack_compute_instance_v2.infra_host" ]
   #scheduler_hints = { group = "${openstack_compute_servergroup_v2.master.id}" }
@@ -48,6 +60,15 @@ resource "openstack_compute_floatingip_v2" "loadbalancer_ip" {
   pool = "${lookup(var.OS_INTERNET_NAME, var.PLATFORM)}"
 }
 
+data "template_file" "loadbalancer_config" {
+  template = "${file("init.tpl")}"
+
+  vars {
+    hostname = "lb01"
+    fqdn     = "lb01.${var.domain_name}"
+  }
+}
+
 resource "openstack_compute_instance_v2" "loadbalancer" {
   name        = "lb01.${var.domain_name}"
   image_name  = "${var.IMAGE_NAME}"
@@ -56,6 +77,8 @@ resource "openstack_compute_instance_v2" "loadbalancer" {
   security_groups = ["${openstack_networking_secgroup_v2.local_ssh.name}",
                      "${openstack_networking_secgroup_v2.openshift_network.name}",
                      "${openstack_networking_secgroup_v2.openshift_endpoints.name}"]
+
+  user_data = "${data.template_file.loadbalancer_config.rendered}"
 
   depends_on = [ "openstack_compute_instance_v2.infra_host" ]
   count = "${var.openshift_loadbalancer}"

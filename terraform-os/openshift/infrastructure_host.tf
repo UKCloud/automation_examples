@@ -17,6 +17,15 @@ data "template_file" "pdns_conf" {
     }
 }
 
+data "template_file" "infra_config" {
+  template = "${file("init.tpl")}"
+  
+  vars {
+    hostname = "infra01"
+    fqdn     = "infra01.${var.domain_name}"
+  }
+}
+
 resource "openstack_compute_floatingip_v2" "infra_host_ip" {
   region = ""
   pool = "${lookup(var.OS_INTERNET_NAME, var.PLATFORM)}"
@@ -28,6 +37,8 @@ resource "openstack_compute_instance_v2" "infra_host" {
   flavor_name = "${var.infra_type}"
   key_pair    = "${openstack_compute_keypair_v2.ssh-keypair.name}"
   security_groups = ["${openstack_networking_secgroup_v2.infra_host.name}"]
+
+  user_data = "${data.template_file.infra_config.rendered}"
 
   network {
     name = "${openstack_networking_network_v2.management.name}"

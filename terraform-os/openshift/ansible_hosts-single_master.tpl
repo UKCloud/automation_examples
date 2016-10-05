@@ -2,8 +2,6 @@
 [OSEv3:children]
 masters
 nodes
-etcd
-lb
 
 # Set variables common for all OSEv3 hosts
 [OSEv3:vars]
@@ -30,7 +28,6 @@ openshift_master_cluster_method=native
 openshift_master_cluster_hostname=${cluster_hostname}.${domain_name}
 openshift_master_cluster_public_hostname=${cluster_hostname}.${domain_name}
 openshift_master_default_subdomain=${app_subdomain}.${domain_name}
-openshift_master_api_port=8443
 
 # Cloud Provider Configuration
 #
@@ -54,14 +51,6 @@ openshift_cloudprovider_openstack_region=${OS_REGION}
 # host group for masters
 [masters]
 ${master_ipaddress}
-
-# host group for etcd
-[etcd]
-${etcd_ipaddress}
-
-# Specify load balancer host
-[lb]
-${loadbalancer_ipaddress}
 
 # host group for nodes, includes region info
 [nodes]
