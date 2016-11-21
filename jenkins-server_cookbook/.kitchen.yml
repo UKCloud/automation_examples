@@ -1,0 +1,26 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_zero
+  require_chef_omnibus: true
+
+platforms:
+  - name: centos-7.1
+    driver_config:
+      network:
+      - ["forwarded_port", {guest: 8080, host: 8080, auto_correct: true}]
+
+suites:
+  - name: master
+    run_list:
+      - recipe[jenkins-server::default]
+    attributes: {
+    	"jenkins-server": {
+    		"github": {
+    			"oauth_userid": "e4fa16fbf05daf62ab05",
+    			"oauth_secret": "6a0556027256d5b2bf49304b430a8cb463e4983b"
+    		}
+    	}
+    }

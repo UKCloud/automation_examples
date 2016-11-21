@@ -1,0 +1,11 @@
+name 'jenkins-server'
+maintainer 'Skyscape Cloud Services'
+maintainer_email 'rcoward@skyscapecloud.com'
+license 'apache2'
+description 'Installs/Configures jenkins-server'
+long_description 'Installs/Configures jenkins-server'
+version '0.1.3'
+
+depends 'java'
+depends 'jenkins'
+depends 'yum-epel'
