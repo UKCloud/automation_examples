@@ -26,3 +26,5 @@ chef-provisioning-fog/cookbooks/*
 terraform/*.tfstate*
 terraform/resources.pdf
 terraform/resources.dot
+
+*.tfstate*
