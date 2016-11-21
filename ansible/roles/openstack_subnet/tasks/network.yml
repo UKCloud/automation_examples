@@ -1,0 +1,6 @@
+---
+- name: Create the neutron network
+  - os_network: "{{ network_name }}"
+    state: present
+    wait: yes
+    

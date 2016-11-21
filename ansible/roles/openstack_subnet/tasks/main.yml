@@ -1,0 +1,5 @@
+---
+# tasks file for openstack_subnet
+
+- include: network.yml
+- include: subnet.yml
