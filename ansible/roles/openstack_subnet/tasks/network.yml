@@ -1,0 +1,7 @@
+---
+- name: Create the {{ network_name }} network
+  os_network:
+    name: "{{ network_name }}"
+    state: present
+    wait: yes
+    

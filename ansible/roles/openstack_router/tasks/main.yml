@@ -1,0 +1,9 @@
+---
+# tasks file for openstack_router
+
+- name: Create the {{ router_name }} router
+  os_router:
+    name: "{{ router_name }}"
+    state: present
+    network: "{{ ext_network }}"
+    interfaces: "{{ subnets }}"

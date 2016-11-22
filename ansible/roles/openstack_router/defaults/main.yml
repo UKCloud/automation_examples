@@ -1,0 +1,6 @@
+---
+# defaults file for openstack_router
+
+router_name: InternetGW
+ext_network: internet
+subnets: {}

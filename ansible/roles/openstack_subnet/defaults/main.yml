@@ -1,0 +1,11 @@
+---
+# defaults file for openstack_subnet
+
+network_name: new_network
+subnet_name: new_subnet
+subnet_cidr: 192.168.1.0/24
+gateway_ip: 192.168.1.1
+allocation_pool_start: 192.168.1.10
+allocation_pool_end: 192.168.1.200
+dns_servers:
+  - 8.8.8.8
