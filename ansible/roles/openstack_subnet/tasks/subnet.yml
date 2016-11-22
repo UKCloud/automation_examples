@@ -1,12 +1,12 @@
 ---
-- name: Create the new subnet
+- name: Create the {{ subnet_name }} subnet
   os_subnet:
     name: "{{ subnet_name }}"
     state: present
     network_name: "{{ network_name }}"
     cidr: "{{ subnet_cidr }}"
     gateway_ip: "{{ gateway_ip }}"
-    dns_servers: "{{ dns_servers }}"
+    dns_nameservers: "{{ dns_servers }}"
     allocation_pool_start: "{{ allocation_pool_start }}"
     allocation_pool_end: "{{ allocation_pool_end }}"
     wait: yes

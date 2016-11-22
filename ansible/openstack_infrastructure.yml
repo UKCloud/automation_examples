@@ -1,0 +1,53 @@
+---
+- name: Deploy infrastructure on OpenStack
+  hosts: localhost
+
+  pre_tasks:
+    - name: Install python-pip
+      become: true
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - epel-release
+        - python-pip
+
+    - name: Install python-shade pre-reqs
+      become: true
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - gcc
+        - python-devel
+        - libffi-devel
+        - openssl-devel
+
+    - name: Install python-shade
+      become: true
+      pip:
+        name: shade
+
+  roles:
+    - role: openstack_subnet
+      network_name: demo_network1
+      subnet_name: demo_subnet1
+      subnet_cidr: 10.0.0.0/24
+      gateway_ip: 10.0.0.1
+      allocation_pool_start: 10.0.0.10
+      allocation_pool_end: 10.0.0.200
+
+    - role: openstack_subnet
+      network_name: demo_network2
+      subnet_name: demo_subnet2
+      subnet_cidr: 10.0.1.0/24
+      gateway_ip: 10.0.1.1
+      allocation_pool_start: 10.0.1.10
+      allocation_pool_end: 10.0.1.200
+
+    - role: openstack_router
+      router_name: demo_router
+      subnets:
+        - demo_subnet1
+        - demo_subnet2
+

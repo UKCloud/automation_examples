@@ -1,7 +1,7 @@
-openstack_subnet
+openstack_router
 ================
 
-An ansible role to wrap up the creation of neutron network and subnets.
+An ansible role to wrap up the creation of a router and it's interfaces.
 
 Requirements
 ------------
@@ -30,35 +30,25 @@ installed using pre_tasks blocks:
         name: shade
 ```
 
-
 Role Variables
 --------------
-```
-network_name: new_network
-subnet_name: new_subnet
-subnet_cidr: 192.168.1.0/24
-gateway_ip: 192.168.1.1
-allocation_pool_start: 192.168.1.10
-allocation_pool_end: 192.168.1.200
-dns_servers:
-  - 8.8.8.8
-```
 
-Example Playbook
-----------------
+```
+router_name: InternetGW
+ext_network: internet
+subnets: {}
+```
 
 ```
 ---
-- name: Deploy OpenStack Network and Subnet
+- name: Deploy OpenStack Router and subnet interfaces
   hosts: localhost
   roles:
-    - role: openstack_subnet
-      network_name: demo_network1
-      subnet_name: demo_subnet1
-      subnet_cidr: 10.0.0.0/24
-      gateway_ip: 10.0.0.1
-      allocation_pool_start: 10.0.0.10
-      allocation_pool_end: 10.0.0.200
+    - role: openstack_router
+      router_name: demo_router
+      subnets:
+        - demo_subnet1
+        - demo_subnet2
 ```
 License and Authors
 -------------------
