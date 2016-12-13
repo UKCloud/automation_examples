@@ -16,7 +16,7 @@ variable "OS_INTERNET_ID" {
 	type = "map"
 	default = {
 		production = "893a5b59-081a-4e3a-ac50-1e54e262c3fa"
-		beta = "1fa82a9d-d87d-4b43-b6dd-54bcbef184d3" 
+		beta = "4bc6fcf9-9235-4a5b-b1fc-ad82eb9741b7" 
 		preprod = "79078955-d9cd-4d77-aeb3-acd9c586e37c"
 	}
 }
@@ -39,6 +39,7 @@ variable "master_type" { default = "t1.tiny" }
 variable "node_type" { default = "t1.tiny" }
 variable "etcd_type" { defualt = "t1.tiny" }
 variable "haproxy_type" { default = "t1.tiny" }
+variable "router_type" { default = "t1.tiny" }
 
 variable "OpenShift_Subnet" { default = "10.0.0.0/24" }
 variable "Management_Subnet" { default = "192.168.1.0/24" }
@@ -47,6 +48,7 @@ variable "openshift_masters" { default = "3" }
 variable "openshift_nodes" { default = "3" }
 variable "openshift_etcd" { default = "3" }
 variable "openshift_loadbalancer" { default = "1" }
+variable "openshift_routers" { default = "1" }
 
 variable "cluster_hostname" { default = "openshift" }
 variable "domain_name" { default = "example.com" }
@@ -59,3 +61,4 @@ variable "mysql_powerdns_password" { default = "VerySecret" }
 variable "powerdns_api_key" { default = "YouWontGuessThis" }
 variable "ansible_hosts_file" { default = "ansible_hosts.tpl" }
 
+variable "router_name" { default = "InternetGW" }

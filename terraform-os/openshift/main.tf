@@ -9,7 +9,7 @@ provider "openstack" {
 
 resource "openstack_networking_router_v2" "internet_gw" {
   region = ""
-  name   = "InternetGW"
+  name   = "${var.router_name}"
   external_gateway = "${lookup(var.OS_INTERNET_ID, var.PLATFORM)}"
 }
 

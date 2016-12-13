@@ -57,7 +57,8 @@ ${master_ipaddress}
 
 # host group for etcd
 [etcd]
-${etcd_ipaddress}
+${master_ipaddress}
+#${etcd_ipaddress}
 
 # Specify load balancer host
 [lb]
@@ -66,4 +67,5 @@ ${loadbalancer_ipaddress}
 # host group for nodes, includes region info
 [nodes]
 ${master_nodes}
+${router_nodes}
 ${compute_nodes}

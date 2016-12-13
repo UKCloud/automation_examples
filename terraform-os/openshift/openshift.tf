@@ -5,7 +5,9 @@ data "template_file" "ansible_hosts" {
 
   vars {
     master_ipaddress = "${join("\n", openstack_compute_instance_v2.master.*.name)}"
-    master_nodes = "${join("\n", formatlist("%s openshift_hostname=%s openshift_node_labels=\"{'region': 'infra', 'zone': 'default', 'router': 'router'}\" openshift_schedulable=true", openstack_compute_instance_v2.master.*.name, openstack_compute_instance_v2.master.*.name))}"
+    #master_nodes = "${join("\n", formatlist("%s openshift_hostname=%s openshift_node_labels=\"{'region': 'infra', 'zone': 'default', 'router': 'router'}\" openshift_schedulable=true", openstack_compute_instance_v2.master.*.name, openstack_compute_instance_v2.master.*.name))}"
+    master_nodes = "${join("\n", formatlist("%s openshift_hostname=%s", openstack_compute_instance_v2.master.*.name, openstack_compute_instance_v2.master.*.name))}"
+    router_nodes = "${join("\n", formatlist("%s openshift_node_labels=\"{'region': 'infra', 'zone': 'default', 'router': 'router'}\" ", openstack_compute_instance_v2.router.*.name ))}"
     compute_nodes = "${join("\n", formatlist("%s openshift_node_labels=\"{'region': '%s', 'zone': '%s'}\"", openstack_compute_instance_v2.node.*.name, "cor0005", "nova"))}"
     cluster_hostname = "${var.cluster_hostname}"
     domain_name = "${var.domain_name}"
@@ -26,16 +28,19 @@ data "template_file" "dns_entries" {
 	
 	vars {
 		delete = "${join("\n", formatlist("DELETE FROM records WHERE domain_id='1' AND name='%s';", 
-					concat(openstack_compute_instance_v2.master.*.name,
+					concat(openstack_compute_instance_v2.master.*.name, 
+              openstack_compute_instance_v2.router.*.name,
 							openstack_compute_instance_v2.node.*.name,
 							openstack_compute_instance_v2.etcd.*.name,
 							openstack_compute_instance_v2.loadbalancer.*.name)))}"
 		insert = "${join("\n", formatlist("INSERT INTO records (domain_id, name, content, type,ttl,prio) VALUES (1,'%s','%s','A',120,NULL);",
 					concat(openstack_compute_instance_v2.master.*.name,
+              openstack_compute_instance_v2.router.*.name,
 							openstack_compute_instance_v2.node.*.name,
 							openstack_compute_instance_v2.etcd.*.name,
 							openstack_compute_instance_v2.loadbalancer.*.name),
 					concat(openstack_compute_instance_v2.master.*.access_ip_v4,
+              openstack_compute_instance_v2.router.*.access_ip_v4,
 							openstack_compute_instance_v2.node.*.access_ip_v4,
 							openstack_compute_instance_v2.etcd.*.access_ip_v4,
 							openstack_compute_instance_v2.loadbalancer.*.access_ip_v4)))}"		
@@ -49,7 +54,7 @@ resource "null_resource" "deploy_openshift" {
 
   # Changes to any instance of the cluster requires re-provisioning
   triggers {
-    cluster_instance_ids = "${join(",", openstack_compute_instance_v2.master.*.id)},${join(",", openstack_compute_instance_v2.node.*.id)},${join(",", openstack_compute_instance_v2.etcd.*.id)},${join(",", openstack_compute_instance_v2.loadbalancer.*.id)},${openstack_compute_instance_v2.infra_host.id}"
+    cluster_instance_ids = "${join(",", openstack_compute_instance_v2.master.*.id)},${join(",", openstack_compute_instance_v2.router.*.id)},${join(",", openstack_compute_instance_v2.node.*.id)},${join(",", openstack_compute_instance_v2.etcd.*.id)},${join(",", openstack_compute_instance_v2.loadbalancer.*.id)},${openstack_compute_instance_v2.infra_host.id}"
     openshift_config = "${data.template_file.ansible_hosts.rendered}"
   }
 
