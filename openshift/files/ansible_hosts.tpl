@@ -32,6 +32,15 @@ openshift_master_cluster_public_hostname=${cluster_hostname}.${domain_name}
 openshift_master_default_subdomain=${app_subdomain}.${domain_name}
 openshift_master_api_port=8443
 
+# enable ntp on masters to ensure proper failover
+openshift_clock_enabled=true
+openshift_metrics_install_metrics=true
+openshift_metrics_cassandra_storage_type=dynamic
+
+os_sdn_network_plugin_name=redhat/openshift-ovs-multitenant
+openshift_router_selector='role=worker'
+openshift_registry_selector='role=infra'
+
 # Cloud Provider Configuration
 #
 # Note: You may make use of environment variables rather than store
@@ -55,17 +64,13 @@ openshift_cloudprovider_openstack_region=${OS_REGION}
 [masters]
 ${master_ipaddress}
 
-# host group for etcd
 [etcd]
 ${master_ipaddress}
-#${etcd_ipaddress}
-
-# Specify load balancer host
-[lb]
-${loadbalancer_ipaddress}
 
 # host group for nodes, includes region info
 [nodes]
 ${master_nodes}
-${router_nodes}
 ${compute_nodes}
+
+[lb]
+${loadbalancer_node}
