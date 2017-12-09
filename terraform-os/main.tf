@@ -165,7 +165,7 @@ resource "openstack_compute_servergroup_v2" "webservers" {
 resource "openstack_compute_instance_v2" "web" {
   name        = "${format("web%02d", count.index + 1)}"
   image_name  = "${var.IMAGE_NAME}"
-  flavor_name = "${var.INSTANCE_TYPE}"
+  flavor_name = "${var.WEB_INSTANCE_TYPE}"
   key_pair    = "${openstack_compute_keypair_v2.ssh-keypair.name}"
   security_groups = ["${openstack_networking_secgroup_v2.local_ssh.name}",
                      "${openstack_networking_secgroup_v2.local_http.name}"]
