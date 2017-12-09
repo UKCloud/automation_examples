@@ -197,7 +197,7 @@ resource "openstack_blockstorage_volume_v1" "db_data" {
 
 resource "openstack_compute_instance_v2" "database" {
   name            = "db01"
-  flavor_name     = "${var.INSTANCE_TYPE}"
+  flavor_name     = "${var.DB_INSTANCE_TYPE}"
   key_pair        = "${openstack_compute_keypair_v2.ssh-keypair.name}"
   security_groups = ["${openstack_networking_secgroup_v2.local_ssh.name}",
                      "${openstack_networking_secgroup_v2.local_mysql.name}"]
