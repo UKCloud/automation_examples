@@ -1,8 +1,5 @@
-# REMOVED VARS as sourced from openrc.sh
-#variable "OS_TENANT_NAME" { default = "" }
-#variable "OS_USERNAME" { default = "" }
-#variable "OS_PASSWORD" { default = "" }
-#variable "OS_AUTH_URL" { default = "" }
+# Use openrc.sh to provide vars for:
+# user_name, tenant_name, password & auth_url
 
 variable "OS_INTERNET_GATEWAY_ID" { default = "893a5b59-081a-4e3a-ac50-1e54e262c3fa" }
 

@@ -1,9 +1,7 @@
 # Configure the OpenStack Provider
 provider "openstack" {
-    #user_name   = "${var.OS_USERNAME}"
-    #tenant_name = "${var.OS_TENANT_NAME}"
-    #password    = "${var.OS_PASSWORD}"
-    #auth_url    = "${var.OS_AUTH_URL}"
+    # Use openrc.sh to provide vars for:
+    # user_name, tenant_name, password & auth_url
     insecure    = "true"
 }
 
@@ -134,7 +132,6 @@ resource "openstack_compute_instance_v2" "jumpbox" {
   network {
     name = "${openstack_networking_network_v2.dmz.name}"
   }
-
 }
 
 resource "openstack_compute_floatingip_associate_v2" "jumpbox_ip" {
