@@ -178,14 +178,16 @@ resource "openstack_compute_instance_v2" "web" {
   count = 2
 }
 
-resource "openstack_blockstorage_volume_v1" "db_system" {
+resource "openstack_blockstorage_volume_v2" "db_system" {
+  region = ""
   name = "db_system"
+  description = "System volume for MySQL"
   size = 30
   image_id = "${var.IMAGE_ID}"
-  description = "System volume for MySQL"
+
 }
 
-resource "openstack_blockstorage_volume_v1" "db_data" {
+resource "openstack_blockstorage_volume_v2" "db_data" {
   region = ""
   name = "db_data"
   description = "data volume for MySQL"
@@ -200,21 +202,20 @@ resource "openstack_compute_instance_v2" "database" {
                      "${openstack_networking_secgroup_v2.local_mysql.name}"]
 
   block_device {
-    uuid = "${openstack_blockstorage_volume_v1.db_system.id}"
+    uuid = "${openstack_blockstorage_volume_v2.db_system.id}"
     source_type = "volume"
     boot_index = 0
-    volume_size = "${openstack_blockstorage_volume_v1.db_system.size}"
+    volume_size = "${openstack_blockstorage_volume_v2.db_system.size}"
     destination_type = "volume"
     delete_on_termination = true
   }
 
   block_device {
-    uuid = "${openstack_blockstorage_volume_v1.db_data.id}"
+    uuid = "${openstack_blockstorage_volume_v2.db_data.id}"
     source_type = "volume"
     boot_index = 1
-    volume_size = "${openstack_blockstorage_volume_v1.db_data.size}"
     destination_type = "volume"
-    delete_on_termination = true
+    delete_on_termination = false
   }
 
   network {
