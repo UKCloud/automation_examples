@@ -133,6 +133,32 @@ resources:
       floatingip_id: { get_resource: jumpbox_ip }
       port_id: { get_resource: jumpbox_port }
 
+
+  install_haproxy:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: |
+        #!/bin/sh
+        sudo yum install -y haproxy
+
+  configure_haproxy:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: |
+        #!/bin/sh
+        sudo sed -i s/:5000/:80/g /etc/haproxy/haproxy.cfg
+        sudo service haproxy restart
+        sudo chkconfig haproxy on
+
+  haproxy_server_init:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: {get_resource: install_haproxy}
+      - config: {get_resource: configure_haproxy}
+
   haproxy_port:
     type: OS::Neutron::Port
     properties:
@@ -141,6 +167,7 @@ resources:
         - subnet_id: { get_resource: dmz_subnet }
       security_groups:
         - { get_resource: http_ext_secgroup }
+        - { get_resource: ssh_int_secgroup }
 
   haproxy_server:
     type: OS::Nova::Server
@@ -151,6 +178,8 @@ resources:
       key_name: { get_resource: example_key }
       networks:
         - port: { get_resource: haproxy_port }
+      user_data:
+        get_resource: haproxy_server_init
 
   haproxy_ip:
     type: OS::Neutron::FloatingIP
@@ -162,6 +191,37 @@ resources:
     properties:
       floatingip_id: { get_resource: haproxy_ip }
       port_id: { get_resource: haproxy_port }
+
+  install_apache:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: |
+        #!/bin/sh
+        sudo yum install -y httpd
+        sudo service httpd restart
+        sudo chkconfig httpd on
+
+  configure_test_page:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: |
+        #!/bin/sh
+        sudo sed -i s/123/456/g /usr/share/httpd/noindex/index.html
+
+  web_server_init:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: {get_resource: install_apache}
+
+  web_server2_init:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: {get_resource: install_apache}
+      - config: {get_resource: configure_test_page}
 
   web_server_1:
     type: OS::Nova::Server
@@ -175,6 +235,8 @@ resources:
       security_groups:
         - { get_resource: ssh_int_secgroup }
         - { get_resource: http_int_secgroup }
+      user_data:
+        get_resource: web_server_init
 
   web_server_2:
     type: OS::Nova::Server
@@ -188,6 +250,8 @@ resources:
       security_groups:
         - { get_resource: ssh_int_secgroup }
         - { get_resource: http_int_secgroup }
+      user_data:
+        get_resource: web_server2_init
 
   db_sys_volume:
     type: OS::Cinder::Volume
