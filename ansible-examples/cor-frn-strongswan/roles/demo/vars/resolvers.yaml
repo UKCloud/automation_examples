@@ -1,0 +1,9 @@
+resolvers:
+    - 8.8.4.4
+    - 8.8.8.8
+resolvers_header: |
+    # This file is managed by the ansible role 'demo'. 
+    # It is intended to be used for demo purposes.
+    # Override the context variable `resolvers` in order
+    # set your own list of nameservers
+    

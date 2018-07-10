@@ -1,0 +1,53 @@
+- name: DMZ Port (FRN)
+  tags: networking
+  when: state != 'absent'
+  os_port:
+      name: frn-port-dmz
+      network: frn-net-dmz
+      state: "{{ state }}"
+      cloud: demo-frn
+      security_groups:
+          - frn-group-strongswan
+          - default
+      allowed_address_pairs:
+          - ip_address: 192.168.1.0/24
+          - ip_address: 192.168.2.0/24
+          - ip_address: 192.168.3.0/24
+          - ip_address: 192.168.4.0/24
+          - ip_address: 192.168.10.0/24
+          - ip_address: 192.168.11.0/24
+
+- name: DMZ Port (COR)
+  tags: networking
+  when: state != 'absent'
+  os_port:
+      name: cor-port-dmz
+      state: "{{ state }}"
+      network: cor-net-dmz
+      cloud: demo-cor
+      security_groups:
+          - cor-group-strongswan
+          - default
+      allowed_address_pairs:
+          - ip_address: 192.168.1.0/24
+          - ip_address: 192.168.2.0/24
+          - ip_address: 192.168.3.0/24
+          - ip_address: 192.168.4.0/24
+          - ip_address: 192.168.10.0/24
+          - ip_address: 192.168.11.0/24
+
+
+- name: DMZ Port (FRN)
+  tags: networking
+  when: state == 'absent'
+  os_port:
+      name: frn-port-dmz
+      network: frn-net-dmz
+      state: "{{ state }}"
+
+- name: DMZ Port (COR)
+  tags: networking
+  when: state == 'absent'
+  os_port:
+      name: cor-port-dmz
+      state: "{{ state }}"

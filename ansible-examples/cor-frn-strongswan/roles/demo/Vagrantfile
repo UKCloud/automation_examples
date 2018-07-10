@@ -1,0 +1,26 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+ANSIBLE_ROLE="demo"
+ANSIBLE_HOME="/home/vagrant/.ansible/"
+Vagrant.configure("2") do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://vagrantcloud.com/search.
+  config.vm.box = "centos/7"
+  config.vm.synced_folder "../", "#{ANSIBLE_HOME}/roles/#{ANSIBLE_ROLE}", type: 'rsync'
+  # The working ansible directory created by ansible_local is owned by root
+  config.vm.provision "shell", inline: "chown vagrant:vagrant #{ANSIBLE_HOME}"
+
+  config.vm.provision "ansible_local" do |ansible|
+    ansible.playbook = "tests/test.yaml"
+  end
+  
+end

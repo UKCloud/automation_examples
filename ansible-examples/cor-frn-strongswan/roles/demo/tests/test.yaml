@@ -1,0 +1,7 @@
+- name: Demo Test
+  hosts: all
+  become: true
+  
+  roles:
+      - role: repo-epel
+      - role: demo

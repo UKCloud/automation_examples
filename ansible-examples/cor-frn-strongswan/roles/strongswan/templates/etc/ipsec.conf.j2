@@ -1,0 +1,21 @@
+# << Ansible managed file >>
+# {{strongswan_config_file}} - strongSwan IPsec configuration file
+
+config setup
+{% for k,v in strongswan_config_setup.iteritems() %}
+	{{k}}={{v}}
+{% endfor %}
+
+conn %default
+{% for k,v in strongswan_conn_default.iteritems() %}
+	{{k}}={{v}}
+{% endfor %}
+
+{% for conn,conn_settings in strongswan_conns.iteritems() %}
+conn {{conn}}
+{%   for k,v in conn_settings.iteritems() %}
+	{{k}}={{v}}
+{%   endfor %}
+
+{% endfor %}
+

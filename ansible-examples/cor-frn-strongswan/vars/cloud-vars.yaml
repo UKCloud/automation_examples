@@ -1,0 +1,9 @@
+frn:
+    image: Centos 7 - LTS
+    flavor: t1.tiny
+    keyname: ewilliams-1
+
+cor:
+    image: centos72
+    flavor: t1.tiny
+    keyname: ewilliams-1

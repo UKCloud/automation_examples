@@ -1,0 +1,54 @@
+---
+
+strongswan_config_file:  "{{strongswan_prefix}}/ipsec.conf"
+
+strongswan_secrets_file: "{{strongswan_prefix}}/ipsec.secrets"
+
+strongswan_config_setup:
+  uniqueids: 'yes'
+  charonstart: 'yes'
+  charondebug: ''
+
+# strongswan_conn_default: Defaults for connections
+#  This will populate the default conn (%default)
+#  An example can be:
+#
+#   strongswan_conn_default:
+#     type: tunnel
+#     ikelifetime: 1h
+#     lifetime: 30m
+#     left: 1.2.3.4
+#
+strongswan_conn_default: {}
+
+# strongswan_conns: Dict to specify connections
+#  Each key represents the name of a connection. The subelemets that the
+#  connection has is any valid directive for a connection
+#  
+#   strongswan_conns:
+#     conn1:
+#       right: 2.3.4.5
+#       rightsubnet: 2.3.4.0/24
+#       ike: aes256-sha1-modp1024
+#       esp: aes256-sha1-modp1024
+#       auto: start
+#
+strongswan_conns: {}
+
+# strongswan_secrets: List of secrets to define
+#  A list that contains the following attributes:
+#     left:       Optional - Any valid ID selector
+#     right:      Optional - Any valid ID selector
+#     type:       Optional (defaults to PSK) - any valid secret type
+#     credential: Required - Connection's credentials
+#
+#   strongswan_secrets:
+#     - left: 1.2.3.4
+#       right: 2.3.4.5
+#       type: PSK
+#       credentials: '"some private PSK here"'
+#
+
+strongswan_secrets: []
+
+# vi:ts=2:sw=2:et:ft=yaml

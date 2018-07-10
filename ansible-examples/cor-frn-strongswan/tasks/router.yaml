@@ -1,0 +1,40 @@
+- name: Router (FRN)
+  tags: networking
+  when: state != 'absent'
+  os_router:
+      name: frn-router
+      cloud: demo-frn
+      state: "{{ state }}"
+      network: internet
+      interfaces:
+          - frn-subnet-a
+          - frn-subnet-b
+          - frn-subnet-dmz
+
+- name: Router (COR)
+  tags: networking
+  when: state != 'absent'
+  os_router:
+      name: cor-router
+      cloud: demo-cor
+      state: "{{ state }}"
+      network: internet
+      interfaces:
+          - cor-subnet-a
+          - cor-subnet-b
+          - cor-subnet-dmz
+
+- name: Router (FRN)
+  when: state == 'absent'
+  os_router:
+      name: frn-router
+      cloud: demo-frn
+      state: "{{ state }}"
+
+- name: Router (COR)
+  when: state == 'absent'
+  os_router:
+      name: cor-router
+      cloud: demo-cor
+      state: "{{ state }}"
+  

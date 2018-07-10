@@ -1,0 +1,11 @@
+- name: Include variables
+  include_vars: resolvers.yaml
+  tags: always
+ 
+- include: dns.yaml
+  tags: dns
+  
+- include_role: 
+    name: repo-epel
+
+- include: packages.yaml

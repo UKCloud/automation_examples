@@ -1,0 +1,110 @@
+- name: Network A (FRN)
+  tags: networking
+  os_network:
+      cloud: demo-frn
+      name: frn-net-a
+      state: "{{ state }}"
+      
+- name: Network B (FRN)
+  tags: networking
+  os_network:
+      cloud: demo-frn
+      name: frn-net-b
+      state: "{{ state }}"
+  
+- name: Network DMZ (FRN)
+  tags: networking
+  os_network:
+      cloud: demo-frn
+      name: frn-net-dmz
+      state: "{{ state }}"
+
+- name: Subnet A (FRN)
+  tags: networking
+  # when: state == 'present'
+  os_subnet:
+      cloud: demo-frn
+      name: frn-subnet-a
+      network_name: frn-net-a
+      cidr: 192.168.1.0/24
+      state: "{{ state }}"
+      dns_nameservers:
+          - 8.8.4.4
+          - 8.8.8.8
+  
+
+- name: Subnet B (FRN)
+  tags: networking
+  os_subnet:
+      cloud: demo-frn
+      name: frn-subnet-b
+      network_name: frn-net-b
+      cidr: 192.168.2.0/24
+      state: "{{ state }}"
+      dns_nameservers:
+          - 8.8.4.4
+          - 8.8.8.8
+
+- name: Subnet DMZ (FRN)
+  tags: networking
+  os_subnet:
+      cloud: demo-frn
+      name: frn-subnet-dmz
+      network_name: frn-net-dmz
+      cidr: 192.168.10.0/24
+      state: "{{ state }}"
+      dns_nameservers:
+          - 8.8.4.4
+          - 8.8.8.8
+
+- name: Network A (COR)
+  os_network:
+      cloud: demo-cor
+      name: cor-net-a
+      state: "{{ state }}"
+      
+- name: Network B (COR)
+  os_network:
+      cloud: demo-cor
+      name: cor-net-b
+      state: "{{ state }}"
+  
+- name: Network DMZ (COR)
+  os_network:
+      cloud: demo-cor
+      name: cor-net-dmz
+      state: "{{ state }}"
+
+
+- name: Subnet A (COR)
+  os_subnet:
+      cloud: demo-cor
+      name: cor-subnet-a
+      network_name: cor-net-a
+      cidr: 192.168.3.0/24
+      state: "{{ state }}"
+      dns_nameservers:
+          - 8.8.4.4
+          - 8.8.8.8
+
+- name: Subnet B (COR)
+  os_subnet:
+      cloud: demo-cor
+      name: cor-subnet-b
+      network_name: cor-net-b
+      cidr: 192.168.4.0/24
+      state: "{{ state }}"
+      dns_nameservers:
+          - 8.8.4.4
+          - 8.8.8.8
+
+- name: Subnet DMZ (COR)
+  os_subnet:
+      cloud: demo-cor
+      name: cor-subnet-dmz
+      network_name: cor-net-dmz
+      cidr: 192.168.11.0/24
+      state: "{{ state }}"
+      dns_nameservers:
+          - 8.8.4.4
+          - 8.8.8.8

@@ -1,0 +1,6 @@
+- name: Setup Demo Host
+  hosts: all
+  become: true
+  roles:
+      - role: demo
+      

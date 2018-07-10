@@ -1,0 +1,25 @@
+---
+galaxy_info:
+  author: Emiliano Castagnari
+  description: Ansible role for StrongSwan
+  license: Apache
+  min_ansible_version: 2.3
+  platforms:
+    - name: EL
+      versions:
+        - 6
+        - 7
+    - name: Debian
+      versions:
+        - wheezy
+    - name: Ubuntu
+      versions:
+        - precise
+        - trusty
+        - xenial
+
+  galaxy_tags:
+    - system
+    - security
+
+dependencies: []

@@ -1,0 +1,121 @@
+- name: Set up networking
+  hosts: localhost
+  tags:
+      - networking
+  vars:
+      - state: present
+  tasks:
+      - include: tasks/network.yaml
+      - include: tasks/router.yaml
+      - include: tasks/secgroups.yaml
+      - include: tasks/ports.yaml
+
+- name: Create bastion hosts
+  tags: 
+      - dmz
+  hosts: localhost
+  vars:
+      - state: present
+  vars_files: 
+      - vars/cloud-vars.yaml
+  tasks:
+      - include: tasks/bastions.yaml
+
+- name: Configure bastions
+  become: true
+  tags: 
+      - dmz
+  hosts: dmz
+  vars:
+      - state: present
+  vars_files: 
+      - vars/cloud-vars.yaml
+  roles:
+      - role: demo
+      - role: bastion
+
+- name: Setup strongswan (FRN)
+  become: true
+  tags:
+      - vpn
+      - dmz
+  hosts: frn-host-dmz
+  vars_files:
+      - vars/cloud-vars.yaml
+  vars:
+      state: present
+      strongswan_conn_default:
+          ikelifetime: 60m
+          keylife: 20m
+          rekeymargin: 3m
+          keyingtries: 1
+          keyexchange: ikev2
+          authby: secret
+      strongswan_secrets:
+          - right:  "cor-host-dmz"
+            left: ""
+            type:  PSK
+            credentials: '"p455w0rd"'
+      strongswan_conns:              
+          conn1:
+              left: "%any"
+              right: "{{ hostvars['cor-host-dmz'].ansible_ssh_host }}"
+              rightsubnet: 192.168.11.0/24
+              leftid: "@frn-host-dmz"
+              rightid: "@cor-host-dmz"
+              ike: aes256-sha1-modp1024
+              esp: aes256-sha1-modp1024
+              auto: start
+  roles:
+      - role: strongswan
+
+- name: Setup strongswan (COR)
+  become: true
+  tags:
+      - vpn
+      - dmz
+  hosts: cor-host-dmz
+  vars_files:
+      - vars/cloud-vars.yaml
+  vars:
+      state: present
+      strongswan_conn_default:
+          ikelifetime: 60m
+          keylife: 20m
+          rekeymargin: 3m
+          keyingtries: 1
+          keyexchange: ikev2
+          authby: secret
+      strongswan_secrets:
+          - left: ""
+            right:  "frn-host-dmz"
+            type:  PSK
+            credentials: '"p455w0rd"'
+      strongswan_conns:              
+          conn1:
+              left: "%any"
+              right: "{{ hostvars['frn-host-dmz'].ansible_ssh_host }}"
+              rightsubnet: 192.168.10.0/24
+              rightid: "@frn-host-dmz"
+              leftid: "@cor-host-dmz"
+              ike: aes256-sha1-modp1024
+              esp: aes256-sha1-modp1024
+              auto: start
+              
+          
+  roles:
+      - role: strongswan
+
+# - name: Create bastion hosts
+#   hosts: bastions
+#   roles:
+#       - role: strongswan
+#       - role: bastion
+#       - role: demo
+#
+# - name: Create gatewayed hosts
+#   hosts: gatewayed
+#   roles:
+#       - role: gatewayed
+#       - role: demo
+#

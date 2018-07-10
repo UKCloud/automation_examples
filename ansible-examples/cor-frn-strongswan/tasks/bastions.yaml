@@ -1,0 +1,43 @@
+- name: Bastion server (FRN)
+  os_server:
+      cloud: demo-frn
+      name: frn-host-dmz
+      image: "{{ frn.image }}"
+      flavor: "{{ frn.flavor }}"
+      key_name: "{{ frn.keyname }}"
+      state: present
+      wait: true
+      nics:
+          - port-name: frn-port-dmz
+  register: newnode
+
+- add_host:
+    name: frn-host-dmz
+    ansible_ssh_host: "{{ newnode.server.public_v4 }}"
+    private_v4: "{{ newnode.server.private_v4 }}"
+    groups:
+        - demo
+        - dmz
+        - frn
+ 
+- name: Bastion server (COR)
+  os_server:
+      cloud: demo-cor
+      name: cor-host-dmz
+      image: "{{ cor.image }}"
+      flavor: "{{ cor.flavor }}"
+      key_name: "{{ cor.keyname }}"
+      state: present
+      wait: true
+      nics:
+          - port-name: cor-port-dmz
+  register: newnode
+
+- add_host:
+    name: cor-host-dmz
+    ansible_ssh_host: "{{ newnode.server.public_v4 }}"
+    private_v4: "{{ newnode.server.private_v4 }}"
+    groups:
+        - demo
+        - dmz
+        - cor

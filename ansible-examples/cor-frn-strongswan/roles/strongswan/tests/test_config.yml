@@ -1,0 +1,33 @@
+---
+
+- name: Defaults
+  hosts: localhost
+  remote_user: root
+
+  vars:
+    - strongswan_config_setup:
+        uniqueids: yes
+        charondebug: 'ike 2, knl 3, cfg 0'
+    - strongswan_conn_default:
+        left: "{{ansible_default_ipv4.address}}"
+        leftsourceip: "{{ansible_default_ipv4.address}}"
+        leftsubnet: 10.0.0.0/16
+        type: tunnel
+        keyexchange: ikev2
+    - strongswan_conns:
+        conn1:
+          right: 1.2.3.4
+          rightsubnet: 2.3.4.0/24
+          ike: aes256-sha1-modp1024
+          esp: aes256-sha1-modp1024
+          auto: route
+    - strongswan_secrets:
+        - left: "{{ansible_default_ipv4.address}}"
+          right: 1.2.3.4
+          type: PSK
+          credentials: '"super wooper dooper secret"'
+
+  roles:
+    - { role: ansible-role-strongswan, become: true }
+
+# vi:ts=2:sw=2:et:ft=yaml

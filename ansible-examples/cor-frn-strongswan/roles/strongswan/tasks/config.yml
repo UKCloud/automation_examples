@@ -1,0 +1,21 @@
+---
+
+- name: Strongswan ipsec.conf
+  template:
+    src: etc/ipsec.conf.j2
+    dest: "{{strongswan_config_file}}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: ipsec reload
+
+- name: Strongswan ipsec.secrets
+  template:
+    src: etc/ipsec.secrets.j2
+    dest: "{{strongswan_secrets_file}}"
+    owner: "root"
+    group: "root"
+    mode: "0640"
+  notify: ipsec secrets reload
+
+# vi:ts=2:sw=2:et:ft=yaml

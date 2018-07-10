@@ -1,0 +1,101 @@
+- name: IPSec Security Group (FRN)
+  os_security_group:
+      cloud: demo-frn
+      state: "{{ state }}"
+      name: frn-group-strongswan
+
+# - name: IPSec Security Group Rules ESP (FRN)
+#   when: state != 'absent'
+#   os_security_group_rule:
+#       cloud: demo-frn
+#       security_group: frn-group-strongswan
+#       protocol: 50
+#       direction: ingress
+#       port_range_min: 1
+#       port_range_max: 65535
+#       state: "{{ state }}"
+
+- name: IPSec Security Group Rules UDP/500 (FRN)
+  when: state != 'absent'
+  os_security_group_rule:
+      cloud: demo-frn
+      security_group: frn-group-strongswan
+      protocol: udp
+      direction: ingress
+      port_range_min: 500
+      port_range_max: 500
+      state: "{{ state }}"
+
+- name: IPSec Security Group Rules UDP/4500 (FRN)
+  when: state != 'absent'
+  os_security_group_rule:
+      cloud: demo-frn
+      security_group: frn-group-strongswan
+      protocol: udp
+      direction: ingress
+      port_range_min: 4500
+      port_range_max: 4500
+      state: "{{ state }}"
+
+
+# - name: IPSec Security Group Rules AH (FRN)
+#   when: state != 'absent'
+#   os_security_group_rule:
+#       cloud: demo-frn
+#       security_group: frn-group-strongswan
+#       protocol: 51
+#       direction: ingress
+#       port_range_min: 1
+#       port_range_max: 65535
+#       state: "{{ state }}"
+
+- name: IPSec Security Group (COR)
+  os_security_group:
+      cloud: demo-cor
+      state: present
+      name: cor-group-strongswan      
+      state: "{{ state }}"
+
+- name: IPSec Security Group Rules UDP/500 (COR)
+  when: state != 'absent'
+  os_security_group_rule:
+      cloud: demo-cor
+      security_group: cor-group-strongswan
+      protocol: udp
+      direction: ingress
+      port_range_min: 500
+      port_range_max: 500
+      state: "{{ state }}"
+
+- name: IPSec Security Group Rules UDP/4500 (COR)
+  when: state != 'absent'
+  os_security_group_rule:
+      cloud: demo-cor
+      security_group: cor-group-strongswan
+      protocol: udp
+      direction: ingress
+      port_range_min: 4500
+      port_range_max: 4500
+      state: "{{ state }}"
+
+# - name: IPSec Security Group Rules ESP (COR)
+#   when: state != 'absent'
+#   os_security_group_rule:
+#       cloud: demo-cor
+#       security_group: cor-group-strongswan
+#       protocol: 50
+#       direction: ingress
+#       port_range_min: 1
+#       port_range_max: 65535
+#       state: "{{ state }}"
+#
+# - name: IPSec Security Group Rules AH (COR)
+#   when: state != 'absent'
+#   os_security_group_rule:
+#       cloud: demo-cor
+#       security_group: cor-group-strongswan
+#       protocol: 51
+#       direction: ingress
+#       port_range_min: 1
+#       port_range_max: 65535
+#       state: "{{ state }}"
