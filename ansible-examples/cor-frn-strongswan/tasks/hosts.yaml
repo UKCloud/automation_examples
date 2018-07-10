@@ -1,0 +1,91 @@
+- name: Host A (FRN)
+  os_server:
+      cloud: demo-frn
+      name: frn-host-a
+      image: "{{ frn.image }}"
+      flavor: "{{ frn.flavor }}"
+      key_name: "{{ frn.keyname }}"
+      state: "{{ state }}"
+      wait: true
+      nics:
+          - net-name: frn-net-a
+  register: newnode
+
+- add_host:
+    name: frn-host-a
+    ansible_ssh_host: "{{ newnode.server.private_v4 }}"
+    ansible_ssh_common_args: '-o "ProxyCommand ssh -i {{ ansible_ssh_private_key_file }}  centos@{{ bastion_ip.frn }} nc  %h %p " -o "StrictHostKeyChecking no"'
+    private_v4: "{{ newnode.server.private_v4 }}"
+    groups:
+        - demo
+        - frn
+        - gatewayed
+
+- name: Host B (FRN)
+  os_server:
+      cloud: demo-frn
+      name: frn-host-b
+      image: "{{ frn.image }}"
+      flavor: "{{ frn.flavor }}"
+      key_name: "{{ frn.keyname }}"
+      state: "{{ state }}"
+      wait: true
+      nics:
+          - net-name: frn-net-b
+  register: newnode
+
+- add_host:
+    name: frn-host-b
+    ansible_ssh_host: "{{ newnode.server.private_v4 }}"
+    ansible_ssh_common_args: '-o "ProxyCommand ssh -i {{ ansible_ssh_private_key_file }}  centos@{{ bastion_ip.frn }} nc  %h %p " -o "StrictHostKeyChecking no"'
+    private_v4: "{{ newnode.server.private_v4 }}"
+    groups:
+        - demo
+        - frn
+        - gatewayed
+
+- name: Host A (COR)
+  os_server:
+      cloud: demo-cor
+      name: cor-host-a
+      image: "{{ cor.image }}"
+      flavor: "{{ cor.flavor }}"
+      key_name: "{{ cor.keyname }}"
+      state: "{{ state }}"
+      wait: true
+      nics:
+          - net-name: cor-net-a
+  register: newnode
+
+- add_host:
+    name: cor-host-a
+    ansible_ssh_host: "{{ newnode.server.private_v4 }}"
+    ansible_ssh_common_args: '-o "ProxyCommand ssh -i {{ ansible_ssh_private_key_file }}  centos@{{ bastion_ip.cor }} nc  %h %p " -o "StrictHostKeyChecking no"'
+    private_v4: "{{ newnode.server.private_v4 }}"
+    groups:
+        - demo
+        - cor
+        - gatewayed
+
+- name: Host B (COR)
+  os_server:
+      cloud: demo-cor
+      name: cor-host-b
+      image: "{{ cor.image }}"
+      flavor: "{{ cor.flavor }}"
+      key_name: "{{ cor.keyname }}"
+      state: "{{ state }}"
+      wait: true
+      nics:
+          - net-name: cor-net-b
+  register: newnode
+
+- add_host:
+    name: cor-host-b
+    ansible_ssh_host: "{{ newnode.server.private_v4 }}"
+    ansible_ssh_common_args: '-o "ProxyCommand ssh -i {{ ansible_ssh_private_key_file }} centos@{{ bastion_ip.cor }} nc  %h %p " -o "StrictHostKeyChecking no"'
+    private_v4: "{{ newnode.server.private_v4 }}"
+    groups:
+        - demo
+        - cor
+        - gatewayed

@@ -12,3 +12,8 @@
   package:
       name: strace
       state: present
+
+- name: netcat
+  package:
+      name: nmap-ncat
+      state: present

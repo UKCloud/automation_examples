@@ -1,0 +1,2 @@
+ansible_ssh_user: centos
+ansible_ssh_private_key_file: ~/.ssh/ewilliams-1.pem

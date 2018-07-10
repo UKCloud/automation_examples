@@ -13,6 +13,7 @@
 - name: Create bastion hosts
   tags: 
       - dmz
+      - gatewayed
   hosts: localhost
   vars:
       - state: present
@@ -33,7 +34,10 @@
   roles:
       - role: demo
       - role: bastion
-
+  pre_tasks:
+      - name: Wait 600 seconds for target connection to become reachable/usable
+        wait_for_connection:
+      
 - name: Setup strongswan (FRN)
   become: true
   tags:
@@ -105,6 +109,34 @@
           
   roles:
       - role: strongswan
+
+- name: Create gatewayed hosts
+  hosts: localhost
+  tags:
+      - gatewayed
+  tasks:
+      - include: tasks/hosts.yaml
+  vars_files: 
+      - vars/cloud-vars.yaml
+  vars:
+      state: present      
+      bastion_ip: 
+          frn: "{{ hostvars['frn-host-dmz'].ansible_ssh_host }}"
+          cor: "{{ hostvars['cor-host-dmz'].ansible_ssh_host }}"
+
+- name: Configure gatewayed hosts
+  tags:
+      - gatewayed
+  hosts: gatewayed
+  become: true
+  vars:
+      ansible_ssh_user: centos
+      ansible_ssh_private_key_file: ~/.ssh/ewilliams-1.pem
+  vars_files: 
+      - vars/cloud-vars.yaml
+  roles:
+      - role: demo
+  
 
 # - name: Create bastion hosts
 #   hosts: bastions
