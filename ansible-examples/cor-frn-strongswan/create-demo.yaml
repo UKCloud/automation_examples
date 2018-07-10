@@ -129,9 +129,6 @@
       - gatewayed
   hosts: gatewayed
   become: true
-  vars:
-      ansible_ssh_user: centos
-      ansible_ssh_private_key_file: ~/.ssh/ewilliams-1.pem
   vars_files: 
       - vars/cloud-vars.yaml
   roles:
