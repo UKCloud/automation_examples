@@ -3,7 +3,7 @@
 This Ansible playbook creates an IPSec VPN connecting two
 sets of networks residing on COR and FRN clouds.
 
-![Cloud to Cloud VPN](images/Cloud to Cloud VPN.png?raw=true "Cloud to Cloud VPN")
+![Cloud to Cloud VPN][diagram]
 
 ## Cloud FRN
 
@@ -88,3 +88,4 @@ for both FRN and COR.
 
 
 
+[diagram]:images/Cloud%20to%20Cloud%20VPN.png?raw=true"
