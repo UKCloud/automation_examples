@@ -1,6 +1,7 @@
 - name: Host A (FRN)
   os_server:
       cloud: demo-frn
+      auto_ip: false
       name: frn-host-a
       image: "{{ frn.image }}"
       flavor: "{{ frn.flavor }}"
@@ -24,6 +25,7 @@
 - name: Host B (FRN)
   os_server:
       cloud: demo-frn
+      auto_ip: false
       name: frn-host-b
       image: "{{ frn.image }}"
       flavor: "{{ frn.flavor }}"
@@ -47,6 +49,7 @@
 - name: Host A (COR)
   os_server:
       cloud: demo-cor
+      auto_ip: false
       name: cor-host-a
       image: "{{ cor.image }}"
       flavor: "{{ cor.flavor }}"
@@ -70,6 +73,7 @@
 - name: Host B (COR)
   os_server:
       cloud: demo-cor
+      auto_ip: false
       name: cor-host-b
       image: "{{ cor.image }}"
       flavor: "{{ cor.flavor }}"
