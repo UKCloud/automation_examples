@@ -7,14 +7,6 @@ sets of networks residing on COR and FRN clouds.
 
 ## Cloud FRN
 
-### Hosts
-
-| Host         | Network     |
----------------|-------------|
-| frn-host-a   | frn-net-a   |
-| frn-host-b   | frn-net-b   |
-| frn-host-dmz | frn-net-dmz |
-
 ### Routers
 
 * frn-router
@@ -27,19 +19,20 @@ sets of networks residing on COR and FRN clouds.
 | frn-net-b   |  192.168.2.0/24 |
 | frn-net-dmz | 192.168.10.0/24 |
 
+### Hosts
+
+| Host         | Network     |
+---------------|-------------|
+| frn-host-a   | frn-net-a   |
+| frn-host-b   | frn-net-b   |
+| frn-host-dmz | frn-net-dmz |
+
+
 ## Cloud COR
 
 ### Routers
 
 * cor-router
-
-### Hosts
-
-| Host         | Network     |
----------------|-------------|
-| cor-host-a   | cor-net-a   |
-| cor-host-b   | cor-net-b   |
-| cor-host-dmz | cor-net-dmz |
 
 ### Networks
 
@@ -48,6 +41,14 @@ sets of networks residing on COR and FRN clouds.
 | cor-net-a   | 192.168.3.0/24  |
 | cor-net-b   | 192.168.4.0/24  |
 | cor-net-dmz | 192.168.11.0/24 |
+
+### Hosts
+
+| Host         | Network     |
+---------------|-------------|
+| cor-host-a   | cor-net-a   |
+| cor-host-b   | cor-net-b   |
+| cor-host-dmz | cor-net-dmz |
 
 ## Getting started
 
