@@ -1,0 +1,16 @@
+- name: IPv4 Forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: IPv6 Forwarding 
+  sysctl:
+    name: net.ipv6.conf.all.forwarding
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+    

@@ -7,6 +7,7 @@
       key_name: "{{ frn.keyname }}"
       state: present
       wait: true
+      auto_ip: true
       nics:
           - port-name: frn-port-dmz
   register: newnode
@@ -15,6 +16,7 @@
     name: frn-host-dmz
     ansible_ssh_host: "{{ newnode.server.public_v4 }}"
     private_v4: "{{ newnode.server.private_v4 }}"
+    cloud: demo-frn
     groups:
         - demo
         - dmz
@@ -28,6 +30,7 @@
       flavor: "{{ cor.flavor }}"
       key_name: "{{ cor.keyname }}"
       state: present
+      auto_ip: true
       wait: true
       nics:
           - port-name: cor-port-dmz
@@ -37,6 +40,7 @@
     name: cor-host-dmz
     ansible_ssh_host: "{{ newnode.server.public_v4 }}"
     private_v4: "{{ newnode.server.private_v4 }}"
+    cloud: demo-cor
     groups:
         - demo
         - dmz

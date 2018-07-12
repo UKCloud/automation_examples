@@ -87,6 +87,14 @@ for both FRN and COR.
           username: ewilliams@ukcloud.com
           password: "password"
 
+## To Do
+### Creating Environment
+
+* Create ansible managed floating IPs
+
+### Destroying Environment
+
+* Remove floating IPs before deleting network; otherwise environment fails
 
 
 [diagram]:images/Cloud%20to%20Cloud%20VPN.png?raw=true"

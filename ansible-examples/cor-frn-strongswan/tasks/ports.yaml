@@ -4,6 +4,8 @@
   os_port:
       name: frn-port-dmz
       network: frn-net-dmz
+      fixed_ips:
+          - ip_address: 192.168.10.10
       state: "{{ state }}"
       cloud: demo-frn
       security_groups:
@@ -24,6 +26,8 @@
       name: cor-port-dmz
       state: "{{ state }}"
       network: cor-net-dmz
+      fixed_ips:
+          - ip_address: 192.168.11.10
       cloud: demo-cor
       security_groups:
           - cor-group-strongswan
@@ -42,7 +46,6 @@
   when: state == 'absent'
   os_port:
       name: frn-port-dmz
-      network: frn-net-dmz
       state: "{{ state }}"
 
 - name: DMZ Port (COR)

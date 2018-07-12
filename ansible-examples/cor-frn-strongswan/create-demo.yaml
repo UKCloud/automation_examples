@@ -2,6 +2,7 @@
   hosts: localhost
   tags:
       - networking
+      - ips
   vars:
       - state: present
   tasks:
@@ -21,6 +22,17 @@
       - vars/cloud-vars.yaml
   tasks:
       - include: tasks/bastions.yaml
+
+# - name: Floating IPs
+#   tags:
+#       - dmz
+#       - networking
+#   hosts: dmz
+#   vars:
+#       - state: present
+#   tasks:
+#       - include: tasks/floating_ips.yaml
+      
 
 - name: Configure bastions
   become: true
@@ -64,7 +76,8 @@
           conn1:
               left: "%any"
               right: "{{ hostvars['cor-host-dmz'].ansible_ssh_host }}"
-              rightsubnet: 192.168.11.0/24
+              rightsubnet: 192.168.11.0/24,192.168.3.0/24,192.168.4.0/24
+              leftsubnet: 192.168.10.0/24,192.168.1.0/24,192.168.2.0/24
               leftid: "@frn-host-dmz"
               rightid: "@cor-host-dmz"
               ike: aes256-sha1-modp1024
@@ -99,7 +112,8 @@
           conn1:
               left: "%any"
               right: "{{ hostvars['frn-host-dmz'].ansible_ssh_host }}"
-              rightsubnet: 192.168.10.0/24
+              leftsubnet: 192.168.11.0/24,192.168.3.0/24,192.168.4.0/24
+              rightsubnet: 192.168.10.0/24,192.168.1.0/24,192.168.2.0/24
               rightid: "@frn-host-dmz"
               leftid: "@cor-host-dmz"
               ike: aes256-sha1-modp1024
@@ -133,6 +147,9 @@
       - vars/cloud-vars.yaml
   roles:
       - role: demo
+  pre_tasks:
+      - name: Wait 600 seconds for target connection to become reachable/usable
+        wait_for_connection:
   
 
 # - name: Create bastion hosts
