@@ -1,0 +1,31 @@
+- name: Create floating IP (COR)
+  os_floating_ip:
+      server: "{{ ansible_host }}"
+      cloud: "{{ cloud }}"
+      state: "{{ state }}"
+      network: internet
+      purge: true
+  when: state=='present'
+  register: floating_ip
+
+- debug:
+    msg: "{{ floating_ip }}"
+  
+# - name: Add floating IP to DMZ
+#   set_fact:
+#       "{{ ansible_hosts['cor-host-dmz'].ansible_ssh_host=floating_ip.results['public_v4']}}"
+
+- name: Create floating IP (FRN)
+  with_items: 
+      - cor
+      - frn
+  os_floating_ip:
+      server: "{{ item }}-host-dmz"
+      cloud: "demo-{{ item }}"
+      state: "{{ state }}"
+      network: internet
+      purge: true
+
+  when: state=='present'
+
+
