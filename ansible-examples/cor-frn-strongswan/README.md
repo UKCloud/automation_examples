@@ -20,7 +20,7 @@ To run using local Ansible and OpenStack clients:
 
 1. Decide whether to use `docker` (recommended) or a local installation of Ansible and the OpenStack client
 
-2. **Install Ansible**: Ansible should be installed on your local machine, preferably in a python `virtualenv` environment.  See 'Initial Configuration' below for instructions.
+2. If not using Docker, Ansible should be installed on your local machine, preferably in a python `virtualenv` environment.  See 'Initial Configuration' below for instructions.
 
 3. Create your `clouds.yaml` configuration file.  The format of this file is shown in the *UKCloud OpenStack Configuration* section below.
 
@@ -28,13 +28,9 @@ To run using local Ansible and OpenStack clients:
 
 ### Initial Configuration
 
-Mandatory configuration settings are found in:
+If not using, docker, you'll need to installed required python dependencies.
 
-* `group_vars/all.yaml`: Add the path to your own key, created in *Getting Started*
-
-* `vars/cloud-vars.yaml`: Add the name of your created SSH key in this file
-
-* Create a python `virtualenv` to install Ansible and the OpenStack clients
+Create a python `virtualenv` to install Ansible and the OpenStack clients
 
 ```
 mkdir -p ~/code/openstack-venv
@@ -42,6 +38,8 @@ virtualenv ~/code/openstack-venv
 source ~/code/openstack-venv/bin/activate
 pip install -r requirements.txt
 ```
+
+Note: Issues with **Ansible 2.6** require the use of Ansible 2.5 or lower.
 
 ### UKCloud OpenStack Configuration
 
@@ -64,10 +62,9 @@ for both FRN and COR.
     ansible:
       use_hostnames: true
 
-
 ### Deployment
 
-To create the demo environment, run the folllowing command:
+To create the demo environment using `docker`, run the following command:
     
     ./create-demo.sh
     
@@ -83,7 +80,7 @@ If not using docker:
 
     ./destroy-demo.sh nodocker
 
-## Cloud FRN
+## Resources Created in Cloud FRN
 
 ### Routers
 
@@ -106,7 +103,7 @@ If not using docker:
 | frn-host-dmz | frn-net-dmz |
 
 
-## Cloud COR
+## Resources Created in Cloud COR
 
 ### Routers
 
