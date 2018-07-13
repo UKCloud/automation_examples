@@ -1,0 +1,15 @@
+clouds:
+  demo-cor:
+    auth:
+      auth_url: https://cor00005.cni.ukcloud.com:13000/v2.0
+      tenant_name: "Contents of OS_TENANT"
+      username: user@example.com
+      password: "password_goes_here"
+  demo-frn:
+    auth:
+      auth_url: https://frn00006.cni.ukcloud.com:13000/v2.0
+      tenant_name: "Contents of OS_TENANT"
+      username: user@example.com
+      password: "password_goes_here"
+ansible:
+  use_hostnames: true

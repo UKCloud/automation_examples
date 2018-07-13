@@ -1,0 +1,40 @@
+- name: Set static routes (COR)
+  when: state == 'present'
+  # command:  openstack --os-cloud demo-cor router set  cor-router --route destination=192.168.1.0/24,gateway=192.168.11.10
+  command: scripts/set_static_route.sh cor 192.168.1.0/24 192.168.11.10
+  register: result
+  failed_when: result.rc !=0 and 'Duplicate' not in result.stderr
+      
+- name: Set static routes (COR)
+  when: state == 'present'
+  # command: openstack --os-cloud demo-cor router set cor-router --route destination=192.168.2.0/24,gateway=192.168.11.10
+  command: scripts/set_static_route.sh cor 192.168.2.0/24 192.168.11.10
+  register: result
+  failed_when: result.rc !=0 and 'Duplicate' not in result.stderr
+
+- name: Set static routes (COR)
+  when: state == 'present'
+  # command: openstack --os-cloud demo-cor router set  cor-router --route destination=192.168.10.0/24,gateway=192.168.11.10
+  command: scripts/set_static_route.sh cor 192.168.10.0/24 192.168.11.10
+  register: result
+  failed_when: result.rc !=0 and 'Duplicate' not in result.stderr
+
+- name: Set static routes (FRN)
+  when: state == 'present'
+  command: scripts/set_static_route.sh frn 192.168.3.0/24 192.168.10.10
+  register: result
+  failed_when: result.rc !=0 and 'Duplicate' not in result.stderr
+      
+- name: Set static routes (FRN)
+  when: state == 'present'
+  # command: OS_REGION_NAME= OS_TENANT_ID= OS_TENANT_NAME= openstack --os-cloud demo-frn router set frn-router --route destination=192.168.4.0/24,gateway=192.168.10.10
+  command: scripts/set_static_route.sh frn 192.168.4.0/24 192.168.10.10
+  register: result
+  failed_when: result.rc !=0 and 'Duplicate' not in result.stderr
+
+- name: Set static routes (FRN)
+  when: state == 'present'
+  command: scripts/set_static_route.sh frn 192.168.11.0/24 192.168.10.10
+  register: result
+  failed_when: result.rc !=0 and 'Duplicate' not in result.stderr
+

@@ -23,16 +23,15 @@
   tasks:
       - include: tasks/bastions.yaml
 
-# - name: Floating IPs
-#   tags:
-#       - dmz
-#       - networking
-#   hosts: dmz
-#   vars:
-#       - state: present
-#   tasks:
-#       - include: tasks/floating_ips.yaml
-      
+- name: Waiting for bastions to settle
+  gather_facts: false
+  tags:
+      - dmz
+  hosts: dmz
+  tasks:
+      - name: Wait for system to become reachable
+        wait_for_connection:
+          timeout: 900
 
 - name: Configure bastions
   become: true
@@ -46,9 +45,6 @@
   roles:
       - role: demo
       - role: bastion
-  pre_tasks:
-      - name: Wait 600 seconds for target connection to become reachable/usable
-        wait_for_connection:
       
 - name: Setup strongswan (FRN)
   become: true
@@ -60,32 +56,12 @@
       - vars/cloud-vars.yaml
   vars:
       state: present
-      strongswan_conn_default:
-          ikelifetime: 60m
-          keylife: 20m
-          rekeymargin: 3m
-          keyingtries: 1
-          keyexchange: ikev2
-          authby: secret
-      strongswan_secrets:
-          - right:  "cor-host-dmz"
-            left: ""
-            type:  PSK
-            credentials: '"p455w0rd"'
-      strongswan_conns:              
-          conn1:
-              left: "%any"
-              right: "{{ hostvars['cor-host-dmz'].ansible_ssh_host }}"
-              rightsubnet: 192.168.11.0/24,192.168.3.0/24,192.168.4.0/24
-              leftsubnet: 192.168.10.0/24,192.168.1.0/24,192.168.2.0/24
-              leftid: "@frn-host-dmz"
-              rightid: "@cor-host-dmz"
-              ike: aes256-sha1-modp1024
-              esp: aes256-sha1-modp1024
-              auto: start
   roles:
       - role: strongswan
-
+  pre_tasks:
+      - name: Wait 600 seconds for target connection to become reachable/usable
+        wait_for_connection:
+  
 - name: Setup strongswan (COR)
   become: true
   tags:
@@ -96,34 +72,12 @@
       - vars/cloud-vars.yaml
   vars:
       state: present
-      strongswan_conn_default:
-          ikelifetime: 60m
-          keylife: 20m
-          rekeymargin: 3m
-          keyingtries: 1
-          keyexchange: ikev2
-          authby: secret
-      strongswan_secrets:
-          - left: ""
-            right:  "frn-host-dmz"
-            type:  PSK
-            credentials: '"p455w0rd"'
-      strongswan_conns:              
-          conn1:
-              left: "%any"
-              right: "{{ hostvars['frn-host-dmz'].ansible_ssh_host }}"
-              leftsubnet: 192.168.11.0/24,192.168.3.0/24,192.168.4.0/24
-              rightsubnet: 192.168.10.0/24,192.168.1.0/24,192.168.2.0/24
-              rightid: "@frn-host-dmz"
-              leftid: "@cor-host-dmz"
-              ike: aes256-sha1-modp1024
-              esp: aes256-sha1-modp1024
-              auto: start
-              
-          
   roles:
       - role: strongswan
-
+  pre_tasks:
+      - name: Wait 600 seconds for target connection to become reachable/usable
+        wait_for_connection:
+  
 - name: Create gatewayed hosts
   hosts: localhost
   tags:
@@ -134,9 +88,16 @@
       - vars/cloud-vars.yaml
   vars:
       state: present      
-      bastion_ip: 
-          frn: "{{ hostvars['frn-host-dmz'].ansible_ssh_host }}"
-          cor: "{{ hostvars['cor-host-dmz'].ansible_ssh_host }}"
+
+- name: Waiting for bastions to settle
+  gather_facts: false
+  tags:
+      - gatewayed
+  hosts: gatewayed
+  tasks:
+      - name: Wait for systems to become reachable
+        wait_for_connection:
+          timeout: 900
 
 - name: Configure gatewayed hosts
   tags:
@@ -151,17 +112,11 @@
       - name: Wait 600 seconds for target connection to become reachable/usable
         wait_for_connection:
   
-
-# - name: Create bastion hosts
-#   hosts: bastions
-#   roles:
-#       - role: strongswan
-#       - role: bastion
-#       - role: demo
-#
-# - name: Create gatewayed hosts
-#   hosts: gatewayed
-#   roles:
-#       - role: gatewayed
-#       - role: demo
-#
+- name: Set up routes
+  tags:
+      - networking
+  hosts: localhost
+  tasks:
+      - include: tasks/routes.yaml
+  vars:
+      state: present

@@ -4,7 +4,6 @@ OS="openstack --os-cloud "
 
 # Remove the gateways
 
-# COR
 echo "WARNING: Do not use on production environments!"
 
 # remove environment variables, otherwise openstack command will prefer them over
@@ -54,7 +53,7 @@ for CLOUD in cor frn; do
   echo "Cleaning up networks in ${CLOUD}"
   for subnet in a b dmz; do
     SUB_ID=$(${CMD} subnet list|grep "${CLOUD}-subnet-${subnet}" | cut -f 2 -d "|")
-    for PORT_ID in $(${CMD} port list | grep "${SUB_ID}" | cut -f 2 -d "|"); do
+    for PORT_ID in $(${CMD} port list | grep ${SUB_ID} | cut -f 2 -d "|"); do
       [ -n "${PORT_ID}" ] && ${CMD} port set ${PORT_ID} --device-owner none
       [ -n "${PORT_ID}" ] && ${CMD} port delete ${PORT_ID}
     done

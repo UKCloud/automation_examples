@@ -68,33 +68,35 @@ Mandatory configuration settings are found in:
 
 * `vars/cloud-vars.yaml`: Add the name of your created SSH key in this file
 
+* Create a python `virtualenv` to install Ansible and the OpenStack clients
+
+```
+mkdir -p ~/code/openstack-venv
+virtualenv ~/code/openstack-venv
+source ~/code/openstack-venv/bin/activate
+pip install -r requirements.txt
+```
+
 ### UKCloud OpenStack Configuration
 
-Configure the file `clouds.yaml` in the playbook root with the credentials
+Copy the file `clouds.yaml.sample` to `clouds.yaml` in the playbook root with the credentials
 for both FRN and COR.
 
     clouds:
       demo-cor:
         auth:
           auth_url: https://cor00005.cni.ukcloud.com:13000/v2.0
-          tenant_name: "Eric Williams Test Account COR"
-          username: ewilliams@ukcloud.com
-          password: "password"
+          tenant_name: "Contents of OS_TENANT"
+          username: user@example.com
+          password: "password_goes_here"
       demo-frn:
         auth:
           auth_url: https://frn00006.cni.ukcloud.com:13000/v2.0
-          tenant_name: Eric Williams Test Account FRN
-          username: ewilliams@ukcloud.com
-          password: "password"
-
-## To Do
-### Creating Environment
-
-* Create ansible managed floating IPs
-
-### Destroying Environment
-
-* Remove floating IPs before deleting network; otherwise environment fails
+          tenant_name: "Contents of OS_TENANT"
+          username: user@example.com
+          password: "password_goes_here"
+    ansible:
+      use_hostnames: true
 
 
 [diagram]:images/Cloud%20to%20Cloud%20VPN.png?raw=true"

@@ -1,3 +1,3 @@
 ansible_ssh_user: centos
-ansible_ssh_private_key_file: ~/.ssh/ewilliams-1.pem
-ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
+ansible_ssh_private_key_file: demo-key
+ansible_ssh_extra_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'

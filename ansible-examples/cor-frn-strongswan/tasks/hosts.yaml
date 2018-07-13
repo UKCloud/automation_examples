@@ -15,7 +15,7 @@
 - add_host:
     name: frn-host-a
     ansible_ssh_host: "{{ newnode.server.private_v4 }}"
-    ansible_ssh_common_args: '-o "ProxyCommand ssh -i {{ ansible_ssh_private_key_file }}  centos@{{ bastion_ip.frn }} nc  %h %p " -o "StrictHostKeyChecking no"'
+    # ansible_ssh_common_args: '-o "ProxyCommand ssh -i {{ ansible_ssh_private_key_file }}  centos@{{ bastion_ip.frn }} nc  %h %p " -o "StrictHostKeyChecking no"'
     private_v4: "{{ newnode.server.private_v4 }}"
     groups:
         - demo
@@ -39,7 +39,7 @@
 - add_host:
     name: frn-host-b
     ansible_ssh_host: "{{ newnode.server.private_v4 }}"
-    ansible_ssh_common_args: '-o "ProxyCommand ssh -i {{ ansible_ssh_private_key_file }}  centos@{{ bastion_ip.frn }} nc  %h %p " -o "StrictHostKeyChecking no"'
+    # ansible_ssh_common_args: '-o "ProxyCommand ssh -i {{ ansible_ssh_private_key_file }}  centos@{{ bastion_ip.frn }} nc  %h %p " -o "StrictHostKeyChecking no"'
     private_v4: "{{ newnode.server.private_v4 }}"
     groups:
         - demo
@@ -63,7 +63,7 @@
 - add_host:
     name: cor-host-a
     ansible_ssh_host: "{{ newnode.server.private_v4 }}"
-    ansible_ssh_common_args: '-o "ProxyCommand ssh -i {{ ansible_ssh_private_key_file }}  centos@{{ bastion_ip.cor }} nc  %h %p " -o "StrictHostKeyChecking no"'
+    # ansible_ssh_common_args: '-o "ProxyCommand ssh -i {{ ansible_ssh_private_key_file }}  centos@{{ bastion_ip.cor }} nc  %h %p " -o "StrictHostKeyChecking no"'
     private_v4: "{{ newnode.server.private_v4 }}"
     groups:
         - demo
@@ -87,7 +87,7 @@
 - add_host:
     name: cor-host-b
     ansible_ssh_host: "{{ newnode.server.private_v4 }}"
-    ansible_ssh_common_args: '-o "ProxyCommand ssh -i {{ ansible_ssh_private_key_file }} centos@{{ bastion_ip.cor }} nc  %h %p " -o "StrictHostKeyChecking no"'
+    # ansible_ssh_common_args: '-o "ProxyCommand ssh -i {{ ansible_ssh_private_key_file }} centos@{{ bastion_ip.cor }} nc  %h %p " -o "StrictHostKeyChecking no"'
     private_v4: "{{ newnode.server.private_v4 }}"
     groups:
         - demo

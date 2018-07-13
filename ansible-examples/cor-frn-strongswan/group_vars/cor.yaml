@@ -1,0 +1,1 @@
+bastion_ip: "{{ hostvars['cor-host-dmz'].ansible_ssh_host }}"
