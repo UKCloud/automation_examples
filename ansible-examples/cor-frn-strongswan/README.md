@@ -99,4 +99,14 @@ for both FRN and COR.
       use_hostnames: true
 
 
+### Deployment
+
+To create the demo environment, run the folllowing command:
+    
+    ./create-demo.sh
+
+To take down the environment:
+
+    ./destroy-demo.sh
+
 [diagram]:images/Cloud%20to%20Cloud%20VPN.png?raw=true"
