@@ -1,0 +1,7 @@
+*~
+clouds.yaml
+.vagrant*
+.vagrant*/
+demo-key*
+*tf_state*
+.terraform/
