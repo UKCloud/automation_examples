@@ -5,60 +5,26 @@ sets of networks residing on COR and FRN clouds.
 
 ![Cloud to Cloud VPN][diagram]
 
-## Cloud FRN
+## TL;DR
 
-### Routers
+To run using docker containers (no python installation required)
 
-* frn-router
+    docker build -t ukcloud/demo-client .
+    ./create-demo.sh
 
-### Networks
+To run using local Ansible and OpenStack clients:
 
-| Network     | Network Address |
-|-------------|-----------------|
-| frn-net-a   |  192.168.1.0/24 |
-| frn-net-b   |  192.168.2.0/24 |
-| frn-net-dmz | 192.168.10.0/24 |
-
-### Hosts
-
-| Host         | Network     |
----------------|-------------|
-| frn-host-a   | frn-net-a   |
-| frn-host-b   | frn-net-b   |
-| frn-host-dmz | frn-net-dmz |
-
-
-## Cloud COR
-
-### Routers
-
-* cor-router
-
-### Networks
-
-| Network     | Network Address |
-|-------------|-----------------|
-| cor-net-a   | 192.168.3.0/24  |
-| cor-net-b   | 192.168.4.0/24  |
-| cor-net-dmz | 192.168.11.0/24 |
-
-### Hosts
-
-| Host         | Network     |
----------------|-------------|
-| cor-host-a   | cor-net-a   |
-| cor-host-b   | cor-net-b   |
-| cor-host-dmz | cor-net-dmz |
+    ./create-demo.sh nodocker
 
 ## Getting started
 
-1. Create an SSH keypair for the deployment.  This SSH key will be used for all hosts in the deployment, and is required by Ansible
+1. Decide whether to use `docker` (recommended) or a local installation of Ansible and the OpenStack client
 
-2. **Install Ansible**: Ansible should be installed on your local machine, preferably in a python `virtualenv` environment.
+2. **Install Ansible**: Ansible should be installed on your local machine, preferably in a python `virtualenv` environment.  See 'Initial Configuration' below for instructions.
 
 3. Create your `clouds.yaml` configuration file.  The format of this file is shown in the *UKCloud OpenStack Configuration* section below.
 
-4. Run `ansible-playbook create-demo.yaml` in the root of the project to create the two environments.
+4. Run `./create-demo.sh` in the root of the project to create the two environments.
 
 ### Initial Configuration
 
@@ -104,9 +70,62 @@ for both FRN and COR.
 To create the demo environment, run the folllowing command:
     
     ./create-demo.sh
+    
+If not using docker:
+
+    ./create-demo.sh nodocker
 
 To take down the environment:
 
     ./destroy-demo.sh
+
+If not using docker:
+
+    ./destroy-demo.sh nodocker
+
+## Cloud FRN
+
+### Routers
+
+* frn-router
+
+### Networks
+
+| Network     | Network Address |
+|-------------|-----------------|
+| frn-net-a   |  192.168.1.0/24 |
+| frn-net-b   |  192.168.2.0/24 |
+| frn-net-dmz | 192.168.10.0/24 |
+
+### Hosts
+
+| Host         | Network     |
+---------------|-------------|
+| frn-host-a   | frn-net-a   |
+| frn-host-b   | frn-net-b   |
+| frn-host-dmz | frn-net-dmz |
+
+
+## Cloud COR
+
+### Routers
+
+* cor-router
+
+### Networks
+
+| Network     | Network Address |
+|-------------|-----------------|
+| cor-net-a   | 192.168.3.0/24  |
+| cor-net-b   | 192.168.4.0/24  |
+| cor-net-dmz | 192.168.11.0/24 |
+
+### Hosts
+
+| Host         | Network     |
+---------------|-------------|
+| cor-host-a   | cor-net-a   |
+| cor-host-b   | cor-net-b   |
+| cor-host-dmz | cor-net-dmz |
 
 [diagram]:images/Cloud%20to%20Cloud%20VPN.png?raw=true"

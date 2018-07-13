@@ -10,6 +10,8 @@
       auto_ip: true
       nics:
           - port-name: frn-port-dmz
+      meta:
+          groups: demo, dmz, frn
   register: newnode
 
 - add_host:
@@ -34,6 +36,9 @@
       wait: true
       nics:
           - port-name: cor-port-dmz
+      meta:
+          groups: demo, dmz, frn
+      
   register: newnode
 
 - add_host:

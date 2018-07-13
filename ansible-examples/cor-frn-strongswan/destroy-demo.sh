@@ -1,8 +1,14 @@
 #!/bin/bash
 
-OS="openstack --os-cloud "
-
-# Remove the gateways
+case $1 in
+nodocker)
+        OS="openstack --os-cloud "
+        ;;
+    *)
+        OS="docker run --entrypoint=openstack --rm -it -v \
+            $(pwd):/ansible/playbooks/ ukcloud/demo-client --os-cloud "
+        ;;
+esac
 
 echo "WARNING: Do not use on production environments!"
 

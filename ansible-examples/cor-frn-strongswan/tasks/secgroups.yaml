@@ -88,6 +88,17 @@
       port_range_max: 4500
       state: "{{ state }}"
 
+- name: IPSec Security Group Rules SSH (COR)
+  when: state != 'absent'
+  os_security_group_rule:
+      cloud: demo-cor
+      security_group: cor-group-strongswan
+      protocol: tcp
+      direction: ingress
+      port_range_min: 22
+      port_range_max: 22
+      state: "{{ state }}"
+
 # - name: IPSec Security Group Rules ESP (COR)
 #   when: state != 'absent'
 #   os_security_group_rule:
