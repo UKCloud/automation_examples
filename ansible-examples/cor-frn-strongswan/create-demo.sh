@@ -22,6 +22,8 @@ if [ ! -f clouds.yaml ]; then
     exit 1
 fi
 
+
+
 case ${1} in
     nodocker)
         OPENSTACK="openstack"
@@ -34,6 +36,8 @@ case ${1} in
             $(pwd):/ansible/playbooks/ ukcloud/demo-client"
         ANSIBLE_PLAYBOOK="docker run --entrypoint=ansible-playbook --rm -it -v \
             $(pwd):/ansible/playbooks/ ukcloud/demo-client"
+        [ -f dockerbuild.log ] || docker build -it ukcloud/demo-client . &> dockerbuild.log
+        
         ;;
 esac
     

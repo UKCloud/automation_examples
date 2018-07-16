@@ -9,6 +9,8 @@ sets of networks residing on COR and FRN clouds.
 
 To run using docker containers (no python installation required)
 
+    git clone https://github.com/UKCloud/automation_examples
+    cd automation_examples/ansible-examples/cor-frn-strongswan
     docker build -t ukcloud/demo-client .
     ./create-demo.sh
 
