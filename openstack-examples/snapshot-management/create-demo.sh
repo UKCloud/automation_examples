@@ -32,6 +32,6 @@ case ${1} in
 esac
 
 # create a server with some volumes
+terraform apply -auto-approve
 
-$OPENSTACK volume create --size 100MB smvol-01
-$OPENSTACK server 
+# after the demo is created, /dev/vdb should be mounted and formatted
