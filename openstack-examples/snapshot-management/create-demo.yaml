@@ -65,6 +65,8 @@
       - backup
   gather_facts: false
   become: true
+  vars_files:
+      - vars/s3.yaml
   pre_tasks:
       # this fails sometimes...
       - include: tasks/settle.yaml
