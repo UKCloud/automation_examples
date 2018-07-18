@@ -1,0 +1,20 @@
+- name: Shutting down server
+  os_server_action:
+    cloud: demo-{{ cloud }}
+    server: server_snap
+    action: stop
+    wait: yes
+
+- name: Creating snapshot
+  command: "scripts/create_snapshot.sh {{ cloud }} bootvol_snap bootvol_snap_snapshot"
+  register: output
+
+- set_fact:
+    snapshot: "{{ output.stdout|from_json }}"
+
+- name: Starting Server
+  os_server_action:
+    cloud: demo-{{ cloud }}
+    server: server_snap
+    action: start
+    wait: yes

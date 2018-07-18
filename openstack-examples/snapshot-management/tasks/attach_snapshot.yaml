@@ -1,0 +1,7 @@
+- name: Attaching snapshot volume (copy) to server
+  os_server_volume:
+    state: present
+    cloud: "demo-{{ cloud }}"
+    server: server_snap
+    volume: bootvol_snap_copy
+    device: /dev/vdc

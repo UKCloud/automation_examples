@@ -1,0 +1,7 @@
+- name: Detaching snapshot volume (copy)
+  os_server_volume:
+      state: absent
+      cloud: "demo-{{ cloud }}"
+      server: server_snap
+      volume: bootvol_snap_copy
+      device: /dev/vdc

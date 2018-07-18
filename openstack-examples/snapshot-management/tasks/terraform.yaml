@@ -1,0 +1,12 @@
+- name: Initialize terraform
+  shell: "terraform init"
+
+# - terraform:
+#       # project_path: .
+#       project_path: .
+#       state: present
+      # state_file: terraform.tfstate
+
+- name: Applying terraform configuration
+  shell: "terraform apply -auto-approve"
+- meta: refresh_inventory

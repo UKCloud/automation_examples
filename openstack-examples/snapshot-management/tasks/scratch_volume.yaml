@@ -1,0 +1,10 @@
+- name: Create filesystem
+  filesystem:
+      type: ext4
+      dev: /dev/vdb
+- name: Mount filesystem
+  mount:
+      src: /dev/vdb
+      path: /mnt/
+      state: mounted
+      fstype: ext4

@@ -12,10 +12,6 @@ if [ ! -f clouds.yaml ]; then
     exit 1
 fi
 
-if [ ! -d .terraform ]; then
-    echo "Please run terraform init in this directory"
-fi
-
 case ${1} in
     nodocker)
         OPENSTACK="openstack"
@@ -28,7 +24,44 @@ case ${1} in
             $(pwd):/backups/ ukcloud/demo-client --os-cloud demo-frn"
         ANSIBLE_PLAYBOOK="docker run --entrypoint=ansible-playbook --rm -it -v \
             $(pwd):/ansible/playbooks/ ukcloud/demo-client"
+        TERRAFORM="docker run --entrypoint=terraform --rm -it -v \
+            $(pwd):/ansible/playbooks/ ukcloud/demo-client"
         ;;
 esac
 
-${ANSIBLE_PLAYBOOK} -i inventory/ create-demo.yaml
+if [ ! -f snapshot-demo-key ]; then
+
+    if ${OPENSTACK} --os-cloud=demo-frn keypair show snapshot-demo-key &>/dev/null; then
+        echo "Key pair 'demo-key' exists but no key file found."
+        echo "Remove 'demo-key' from openstack using the following commandf:"
+        echo "  ${OPENSTACK} --os-cloud=demo-frn keypair delete snapshot-demo-key"
+        echo
+        BREAK=yes
+    fi
+    if ${OPENSTACK} --os-cloud=demo-cor keypair show snapshot-demo-key &>/dev/null; then
+        echo "Key pair 'snapshot-demo-key' exists but no key file found."
+        echo "Remove 'snapshot-demo-key' from openstack using the following commandf:"
+        echo "  ${OPENSTACK} --os-cloud=demo-cor keypair delete snapshot-demo-key"
+        echo
+        BREAK=yes
+    fi
+
+    if [[ "${BREAK}" == "yes" ]]; then
+        exit 1
+    fi
+
+    echo "Creating snapshot-demo-key"
+    ssh-keygen -f snapshot-demo-key  -t rsa -N '' &>/dev/null
+
+    echo "Adding SSH key to COR"
+    ${OPENSTACK} --os-cloud=demo-cor \
+        keypair create --public-key snapshot-demo-key.pub snapshot-demo-key
+
+fi
+
+
+${ANSIBLE_PLAYBOOK} -i inventory/ create-demo.yaml $*
+
+echo "==========="
+echo
+echo "Run '$TERRAFORM' destroy to remove the environment"

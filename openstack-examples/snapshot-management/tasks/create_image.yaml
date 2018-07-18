@@ -1,0 +1,4 @@
+- name: Dumping image of snapshot volume (copy)
+  shell: "[ ! -f /mnt/bootvol_snap_snapshot.gz ] && dd if=/dev/vdc | gzip > /mnt/bootvol_snap_snapshot.gz || echo Exists, skipping"
+- name: Sending image to S3
+  shell: "AWS_ACCESS_KEY_ID='{{ aws_access_key_id }}' AWS_SECRET_ACCESS_KEY='{{ aws_secret_access_key }}' PASSPHRASE='{{ gpg_passphrase }}' duplicity full /mnt/bootvol_snap_snapshot.gz s3://{{ s3_endpoint_host }}/snapshots/$(hostname)"

@@ -1,0 +1,27 @@
+- name: Install EPEL
+  yum:
+      name: epel-release
+
+- name: Install Duplicity
+  yum:
+      name: duplicity
+
+- name: Install Joe
+  yum:
+      name: joe
+
+- name: Duplicity config directory
+  file:
+      path: /root/.duplicity/
+      state: directory
+      owner: root
+      group: root
+      mode: 0700
+
+- name: Create duplicity configuration
+  template:
+      src: templates/credentials.conf.j2
+      dest: /root/.duplicity/.credentials.conf
+      owner: root
+      group: root
+      mode: 0600

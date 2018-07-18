@@ -1,0 +1,102 @@
+- name: Create infrastructure (Terraform)
+  gather_facts: false
+  hosts: localhost
+  connection: local
+  tags:
+      - provision
+      - terraform
+  tasks:
+      - include: tasks/terraform.yaml
+- name: Wait for hosts to settle
+  hosts: all
+  gather_facts: false
+  tags:
+      - provision
+      - hosts
+      - volumes
+  tasks:
+      - include: tasks/settle.yaml
+
+- name: Configure host
+  hosts: snapshot_demo
+  become: true
+  tags:
+      - hosts
+  tasks:
+      - include: tasks/host_config.yaml
+
+- name: Configure scratch disk
+  hosts: snapshot_demo
+  become: true
+  tags:
+      - hosts
+  tasks:
+      - include: tasks/scratch_volume.yaml
+
+- name: Create snapshot
+  hosts: localhost
+  gather_facts: no
+  tags:
+      - volumes
+  tasks:
+      - include: tasks/create_snapshot.yaml
+
+- name: Create copy from Snapshot
+  hosts: localhost
+  gather_facts: no
+  tags:
+      - volumes
+  tasks:
+      - include: tasks/copy_snapshot.yaml
+
+- name: Attach snapshot copy
+  hosts: localhost
+  gather_facts: false
+  tags:
+      - hosts
+      - volumes
+  connection: local
+  tasks:
+      - include: tasks/attach_snapshot.yaml
+
+- name: Create image of volume
+  hosts: snapshot_demo
+  tags:
+      - backup
+  gather_facts: false
+  become: true
+  pre_tasks:
+      # this fails sometimes...
+      - include: tasks/settle.yaml
+  tasks:
+      - include: tasks/create_image.yaml
+
+
+- name: Detach snapshot copy
+  hosts: localhost
+  gather_facts: false
+  tags:
+      - hosts
+      - volumes
+      # - teardown
+  connection: local
+  tasks:
+      - include: tasks/detach_snapshot.yaml
+
+- name: Delete snapshot copy
+  hosts: localhost
+  gather_facts: false
+  tags:
+      - volumes
+      - teardown
+  tasks:
+      - include: tasks/delete_snapshot.yaml
+
+- name: Delete snapshot
+  hosts: localhost
+  gather_facts: false
+  tags:
+      - volumes
+      - teardown
+  tasks:
+      - command: "scripts/delete_snapshot.sh {{ cloud }} bootvol_snap bootvol_snap_snapshot"

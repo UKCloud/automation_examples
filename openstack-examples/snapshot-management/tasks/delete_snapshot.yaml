@@ -1,0 +1,6 @@
+- name: Deleting snapshot volume (copy)
+  os_volume:
+    cloud: "demo-{{ cloud }}"
+    state: absent
+    volume: bootvol_snap_copy
+    display_name: bootvol_snap_copy

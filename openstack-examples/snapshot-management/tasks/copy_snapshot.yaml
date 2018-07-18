@@ -1,0 +1,7 @@
+- name: Creating volume from snapshot
+  os_volume:
+    cloud: demo-{{ cloud }}
+    state: present
+    display_name: bootvol_snap_copy
+    snapshot_id: "{{ snapshot.id }}"
+    size: 20

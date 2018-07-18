@@ -22,9 +22,9 @@ resource "openstack_compute_floatingip_v2" "floatip_snap" {
 
 # Key for accessing server
 
-resource "openstack_compute_keypair_v2" "snapshot-demo-keypair" {
-  name       = "snapshot-demo-keypair"
-  public_key = "${var.SSH_KEY}"
+resource "openstack_compute_keypair_v2" "snapshot-demo-key" {
+  name       = "snapshot-demo-key"
+  public_key = "${file("snapshot-demo-key.pub")}"
   region = "regionOne"
 }
 
@@ -83,10 +83,9 @@ resource "openstack_compute_instance_v2" "server_snap" {
 
     security_groups = ["default"]
     region = "regionOne"
-    key_pair = "snapshot-demo-keypair"
-    depends_on = ["openstack_networking_subnet_v2.subnet_snap"]
+    key_pair = "snapshot-demo-key"
+    # depends_on = ["openstack_networking_subnet_v2.subnet_snap"]
     depends_on = ["openstack_networking_subnet_v2.subnet_snap", "openstack_blockstorage_volume_v2.bootvol_snap"]
-    image_id = "${data.openstack_images_image_v2.centos.id}"
 
     block_device {
       /*uuid                  = "${data.openstack_images_image_v2.centos.id}"*/
@@ -109,7 +108,7 @@ resource "openstack_compute_instance_v2" "server_snap" {
     connection {
       user        = "centos"
       host        = "${openstack_compute_floatingip_v2.floatip_1.address}"
-      private_key = "${file("~/.ssh/id_rsa")}"
+      private_key = "${file("snapshot-demo-key")}"
     }
 
     metadata = {
@@ -134,27 +133,7 @@ resource "openstack_blockstorage_volume_v2" "bootvol_snap" {
   volume_type = "TIER1"
 }
 
-/*resource "openstack_blockstorage_volume_v2" "scratch_volume"*/
 
-/*resource "openstack_compute_instance_v2" "boot-from-volume" {
-  name            = "boot-from-volume"
-  flavor_id       = "3"
-  key_pair        = "my_key_pair_name"
-  security_groups = ["default"]
-
-  block_device {
-    uuid                  = "<image-id>"
-    source_type           = "image"
-    volume_size           = 5
-    boot_index            = 0
-    destination_type      = "volume"
-    delete_on_termination = true
-  }
-
-  network {
-    name = "my_network"
-  }
-}*/
 output "bootvol_snap_id" {
     value = "${openstack_blockstorage_volume_v2.bootvol_snap.id}"
 }
