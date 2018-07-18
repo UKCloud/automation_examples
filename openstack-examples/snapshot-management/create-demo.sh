@@ -5,15 +5,15 @@ unset OS_PASSWORD
 unset OS_REGION_NAME
 unset OS_TENANT_ID
 unset OS_TENANT_NAME
-unset OS_USERNAME   
-
-IMAGE="Ubuntu 16.04 amd64"
-FLAVOR="t1.small"
-SG=default
+unset OS_USERNAME
 
 if [ ! -f clouds.yaml ]; then
     echo "Please create a valid clouds.yaml"
     exit 1
+fi
+
+if [ ! -d .terraform ]; then
+    echo "Please run terraform init in this directory"
 fi
 
 case ${1} in
@@ -31,7 +31,4 @@ case ${1} in
         ;;
 esac
 
-# create a server with some volumes
-terraform apply -auto-approve
-
-# after the demo is created, /dev/vdb should be mounted and formatted
+${ANSIBLE_PLAYBOOK} -i inventory/ create-demo.yaml

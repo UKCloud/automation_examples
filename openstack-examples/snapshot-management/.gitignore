@@ -5,3 +5,5 @@ clouds.yaml
 demo-key*
 *tf_state*
 .terraform/
+*retry
+image.gz
