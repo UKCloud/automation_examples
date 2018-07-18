@@ -16,7 +16,7 @@ If you wish to run the demo without using Docker, add the argument `nodocker` to
 
 ```bash
 
-./create_demo nodocker
+./create_demo.sh nodocker
 
 ```
 
