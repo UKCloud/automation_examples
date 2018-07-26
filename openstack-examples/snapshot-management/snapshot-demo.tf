@@ -10,8 +10,13 @@ data "openstack_networking_network_v2" "internet" {
 data "openstack_images_image_v2" "centos" {
   name =  "centos72"
   most_recent = true
+  # min_size = 20
 }
 
+data "openstack_images_image_v2" "win2012" {
+	name = "windows-2012r2-LTS"
+	# min_size = 60
+}
 
 # define resource for public network
 
@@ -84,6 +89,7 @@ resource "openstack_compute_instance_v2" "server_snap" {
     security_groups = ["default"]
     region = "regionOne"
     key_pair = "snapshot-demo-key"
+	admin_pass = "myPassIsGreat1"
     # depends_on = ["openstack_networking_subnet_v2.subnet_snap"]
     depends_on = ["openstack_networking_subnet_v2.subnet_snap", "openstack_blockstorage_volume_v2.bootvol_snap"]
 
@@ -127,13 +133,18 @@ resource "openstack_compute_instance_v2" "server_snap" {
 resource "openstack_blockstorage_volume_v2" "bootvol_snap" {
   name        = "bootvol_snap"
   description = "Snapshot Demo Volume"
-  size        = 20
+  size        = 60
   region = "regionOne"
-  image_id = "${data.openstack_images_image_v2.centos.id}"
-  volume_type = "TIER1"
+  #  image_id = "${data.openstack_images_image_v2.centos.id}"
+  image_id = "${data.openstack_images_image_v2.win2012.id}"
+  volume_type = "TIER2"
 }
 
 
 output "bootvol_snap_id" {
     value = "${openstack_blockstorage_volume_v2.bootvol_snap.id}"
+}
+
+output "admin_password" {
+	value = "${openstack_compute_instance_v2.server_snap.admin_pass}"
 }

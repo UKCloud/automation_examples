@@ -20,6 +20,8 @@
 - name: Configure host
   hosts: snapshot_demo
   become: true
+  vars_files:
+      - vars/s3.yaml
   tags:
       - hosts
   tasks:
