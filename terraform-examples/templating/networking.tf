@@ -3,7 +3,7 @@ resource "openstack_networking_floatingip_v2" "floatip_1" {
 }
 
 resource "openstack_networking_network_v2" "networks" {
-    count = 3
+    count = "${var.num_nets}"
     name = "${format("%s_%d", var.network_name, count.index+1)}"
 }
 
@@ -44,4 +44,3 @@ resource "openstack_networking_secgroup_rule_v2" "secgroup_rule_1" {
     remote_ip_prefix  = "0.0.0.0/0"
     security_group_id = "${openstack_networking_secgroup_v2.secgroup_1.id}"
 }
-
