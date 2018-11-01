@@ -1,0 +1,17 @@
+---
+- name: Override glusterfs_daemon for Ubuntu 14.04.
+  set_fact:
+    glusterfs_daemon: glusterfs-server
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - ansible_distribution_version == "14.04"
+
+# Setup/install tasks.
+- include: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+- include: setup-{{ ansible_distribution }}.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure GlusterFS is started and enabled at boot.
+  service: "name={{ glusterfs_daemon }} state=started enabled=yes"

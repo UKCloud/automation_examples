@@ -1,0 +1,17 @@
+- name: Create filesystem on VDB
+  filesystem:
+      fstype: xfs
+      dev: /dev/vdb
+
+# make the brick path
+- name: Make mountpoint for VDB
+  file:
+      path: "{{ gluster_brick_dir }}"
+      state: directory
+
+- name: Mount VDB on brick directory
+  mount:
+      path: "{{ gluster_brick_dir }}"
+      src: /dev/vdb
+      fstype: xfs
+      state: mounted

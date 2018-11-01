@@ -1,0 +1,16 @@
+- name: Install gluster Fuse client
+  yum:
+      name: glusterfs-fuse
+      state: latest
+      
+- name: Install httpd
+  yum:
+      name: httpd
+      state: latest
+
+- name: Mount glusterfs
+  mount:
+      fstype: glusterfs
+      src: "{{ groups['gluster'][0] }}:{{ gluster_brick_name }}"
+      path: /var/www/html
+      state: present

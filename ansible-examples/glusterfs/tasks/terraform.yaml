@@ -1,0 +1,4 @@
+- name: Bring up infrastructure
+  terraform:
+      project_path: terraform
+      state: present

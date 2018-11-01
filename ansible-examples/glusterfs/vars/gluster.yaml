@@ -1,0 +1,3 @@
+gluster_mount_dir: /mnt/gluster
+gluster_brick_dir: /data/glusterfs/myvol1/brick1
+gluster_brick_name: gluster

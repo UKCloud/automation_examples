@@ -1,0 +1,31 @@
+- hosts: localhost
+  gather_facts: no
+  connection: local
+  tags:
+      - provisioning
+  tasks:
+      - include: task/terraform.yaml
+
+- hosts: gluster-demo
+  sudo: yes
+  tasks:
+      - include: tasks/hosts.yaml
+
+- hosts: gluster
+  sudo: yes
+  vars_files:
+    - vars/gluster.yaml
+  roles:
+    - glusterfs
+  tasks:
+      - include: tasks/mounts.yaml
+      - include: tasks/gluster.yaml
+
+- hosts: compute
+  sudo: yes
+  tags:
+      - client
+  vars_files:
+      - vars/gluster.yaml
+  tasks:
+      - include: tasks/gluster_client.yaml

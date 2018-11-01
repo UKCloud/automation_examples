@@ -1,0 +1,12 @@
+---
+- name: Ensure dependencies are installed.
+  yum:
+    name: "centos-release-gluster{{ glusterfs_default_release }}"
+    state: present
+
+- name: Ensure Gluster packages are installed.
+  yum:
+    name:
+      - glusterfs-server
+      - glusterfs-client
+    state: present

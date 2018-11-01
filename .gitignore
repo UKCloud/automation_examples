@@ -45,4 +45,4 @@ crash.log
 # example.tfvars
 
 # Ansible leftovers
-*.retry
+**/*.retry

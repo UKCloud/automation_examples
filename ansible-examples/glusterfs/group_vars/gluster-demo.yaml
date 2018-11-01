@@ -1,0 +1,8 @@
+ansible_ssh_user: centos
+ansible_ssh_private_key_file: gluster-demo.pem
+bastion_ip: "{{ hostvars[groups['vpn'][0]].openstack.public_v4 }}"
+ansible_ssh_user: centos
+ansible_host: "{{ private_v4 }}"
+ansible_ssh_common_args: >
+  -o "ProxyCommand ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+  -i {{ ansible_ssh_private_key_file }} centos@{{ bastion_ip }} -W  %h:%p"

@@ -1,0 +1,8 @@
+plugin: openstack
+expand_hostvars: no
+fail_on_errors: yes
+show_all: yes
+private: yes
+only_clouds:
+    - demo-frn
+inventory_hostname: name
