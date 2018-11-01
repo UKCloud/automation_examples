@@ -46,3 +46,4 @@ crash.log
 
 # Ansible leftovers
 **/*.retry
+**/.DS_Store

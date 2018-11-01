@@ -2,15 +2,26 @@
   yum:
       name: glusterfs-fuse
       state: latest
-      
+
 - name: Install httpd
   yum:
       name: httpd
       state: latest
+
+- name: ensure httpd is running
+  service:
+      name: httpd
+      state: started
 
 - name: Mount glusterfs
   mount:
       fstype: glusterfs
       src: "{{ groups['gluster'][0] }}:{{ gluster_brick_name }}"
       path: /var/www/html
-      state: present
+      state: mounted
+
+- name: Fix SELinux Permissions
+  seboolean:
+      name: httpd_use_fusefs
+      state: yes
+      persistent: yes

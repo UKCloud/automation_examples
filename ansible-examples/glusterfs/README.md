@@ -1,4 +1,5 @@
 ## GlusterFS Deployment Example
+![Environment Diagram](pics/openstack.png)
 
 This demo creates a 3-tiered infrastructure with the following components:
 
@@ -48,4 +49,14 @@ cd ..
 
 ansible-playbook -i openstack.yaml main.yaml
 
+```
+
+## Teardown
+
+Use terraform to remove the demo.
+
+```bash
+
+cd terraform/
+terraform destroy
 ```
