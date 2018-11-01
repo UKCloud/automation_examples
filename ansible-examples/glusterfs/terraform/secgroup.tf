@@ -58,20 +58,20 @@ resource "openstack_networking_secgroup_rule_v2" "gluster_portmapper_udp" {
     security_group_id = "${openstack_networking_secgroup_v2.gluster.id}"
 }
 
-resource "openstack_networking_secgroup_v2" "compute" {
-    name = "${var.environment}-compute"
-    description = "Compute hosts"
+resource "openstack_networking_secgroup_v2" "app" {
+    name = "${var.environment}-app"
+    description = "App hosts"
 }
 
-resource "openstack_networking_secgroup_rule_v2" "compute_tcp" {
-    count = "${length(var.compute_ports_tcp)}"
+resource "openstack_networking_secgroup_rule_v2" "app_tcp" {
+    count = "${length(var.app_ports_tcp)}"
     direction         = "ingress"
     ethertype         = "IPv4"
     protocol = "tcp"
-    port_range_min = "${var.compute_ports_tcp[count.index]}"
-    port_range_max = "${var.compute_ports_tcp[count.index]}"
+    port_range_min = "${var.app_ports_tcp[count.index]}"
+    port_range_max = "${var.app_ports_tcp[count.index]}"
     remote_ip_prefix = "192.168.0.0/16"
-    security_group_id = "${openstack_networking_secgroup_v2.compute.id}"
+    security_group_id = "${openstack_networking_secgroup_v2.app.id}"
 }
 
 resource "openstack_networking_secgroup_v2" "ssh_host" {

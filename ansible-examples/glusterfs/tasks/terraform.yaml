@@ -2,3 +2,8 @@
   terraform:
       project_path: terraform
       state: present
+      # force_init is available in 2.6
+      # force_init: yes
+
+- name: Refresh inventory
+  meta: refresh_inventory

@@ -1,11 +1,11 @@
-resource "openstack_networking_network_v2" "vpn" {
-    name = "${var.environment}-vpn"
+resource "openstack_networking_network_v2" "dmz" {
+    name = "${var.environment}-dmz"
 }
 
-resource "openstack_networking_subnet_v2" "vpn" {
-    network_id = "${openstack_networking_network_v2.vpn.id}"
-    name = "${var.environment}-vpn"
-    cidr = "${var.cidr["vpn"]}"
+resource "openstack_networking_subnet_v2" "dmz" {
+    network_id = "${openstack_networking_network_v2.dmz.id}"
+    name = "${var.environment}-dmz"
+    cidr = "${var.cidr["dmz"]}"
     dns_nameservers = "${var.dns_nameservers}"
 }
 
@@ -20,14 +20,14 @@ resource "openstack_networking_subnet_v2" "storage" {
     dns_nameservers = "${var.dns_nameservers}"
 }
 
-resource "openstack_networking_network_v2" "compute" {
-    name = "${var.environment}-compute"
+resource "openstack_networking_network_v2" "app" {
+    name = "${var.environment}-app"
 }
 
-resource "openstack_networking_subnet_v2" "compute" {
-    name = "${var.environment}-compute"
-    network_id = "${openstack_networking_network_v2.compute.id}"
-    cidr = "${var.cidr["compute"]}"
+resource "openstack_networking_subnet_v2" "app" {
+    name = "${var.environment}-app"
+    network_id = "${openstack_networking_network_v2.app.id}"
+    cidr = "${var.cidr["app"]}"
     dns_nameservers = "${var.dns_nameservers}"
 }
 
@@ -37,9 +37,9 @@ resource "openstack_networking_router_v2" "router" {
 }
 
 // interfaces
-// vpn
-resource "openstack_networking_router_interface_v2" "vpn" {
-    subnet_id = "${openstack_networking_subnet_v2.vpn.id}"
+// dmz
+resource "openstack_networking_router_interface_v2" "dmz" {
+    subnet_id = "${openstack_networking_subnet_v2.dmz.id}"
     router_id = "${openstack_networking_router_v2.router.id}"
 }
 
@@ -49,9 +49,9 @@ resource "openstack_networking_router_interface_v2" "storage" {
     router_id = "${openstack_networking_router_v2.router.id}"
 }
 
-// compute
-resource "openstack_networking_router_interface_v2" "compute" {
-    subnet_id = "${openstack_networking_subnet_v2.compute.id}"
+// app
+resource "openstack_networking_router_interface_v2" "app" {
+    subnet_id = "${openstack_networking_subnet_v2.app.id}"
     router_id = "${openstack_networking_router_v2.router.id}"
 }
 

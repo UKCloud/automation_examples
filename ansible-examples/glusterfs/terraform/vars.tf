@@ -35,7 +35,7 @@ variable "dns_nameservers" {
       "8.8.8.8"
   ]
 }
-variable "compute_count" {
+variable "app_count" {
     default = 2
 }
 
@@ -43,7 +43,7 @@ variable "gluster_count" {
   default = 6
 }
 
-variable "compute_ports_tcp" {
+variable "app_ports_tcp" {
     default = [
         "80",
         "443",
@@ -54,12 +54,12 @@ variable "compute_ports_tcp" {
 
 variable "cidr" {
   default = {
-      vpn = "192.168.1.0/24",
+      dmz = "192.168.1.0/24",
       storage = "192.168.2.0/24",
-      compute = "192.168.3.0/24"
+      app = "192.168.3.0/24"
   }
 }
 
 variable "key_pair_name" {
-  default = "ewilliams-1"
+  default = "gluster-demo"
 }

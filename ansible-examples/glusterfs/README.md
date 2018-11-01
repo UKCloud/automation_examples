@@ -31,6 +31,15 @@ This cluster can be scaled by changing the `gluster_count` variable in `terrafor
 
 ```bash
 openstack keypair create gluster-demo > gluster-demo.key
+chmod 600 gluster-demo.key
+```
+
+2. Initialize Terraform
+
+```bash
+cd terraform/
+terraform init
+cd ..
 ```
 
 2. Use Ansible to run the playbook `main.yaml`

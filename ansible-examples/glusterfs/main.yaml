@@ -4,15 +4,17 @@
   tags:
       - provisioning
   tasks:
-      - include: task/terraform.yaml
+      - include: tasks/terraform.yaml
 
 - hosts: gluster-demo
-  sudo: yes
+  become: yes
+  become_method: sudo
   tasks:
       - include: tasks/hosts.yaml
 
 - hosts: gluster
-  sudo: yes
+  become: yes
+  become_method: sudo
   vars_files:
     - vars/gluster.yaml
   roles:
@@ -21,8 +23,9 @@
       - include: tasks/mounts.yaml
       - include: tasks/gluster.yaml
 
-- hosts: compute
-  sudo: yes
+- hosts: app
+  become: yes
+  become_method: sudo
   tags:
       - client
   vars_files:

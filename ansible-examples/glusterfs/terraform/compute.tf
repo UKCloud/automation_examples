@@ -4,8 +4,8 @@
 #   \_/ | .__/|_| |_|
 #       |_|
 
-resource "openstack_compute_instance_v2" "vpn" {
-    name = "${var.environment}-vpn"
+resource "openstack_compute_instance_v2" "dmz" {
+    name = "${var.environment}-dmz"
     image_id = "${data.openstack_images_image_v2.centos.id}"
     flavor_id = "${data.openstack_compute_flavor_v2.small.id}"
     key_pair = "${var.key_pair_name}"
@@ -14,22 +14,22 @@ resource "openstack_compute_instance_v2" "vpn" {
     ]
 
     metadata {
-        groups = "gluster-demo,vpn"
+        groups = "gluster-demo,dmz"
     }
     network {
-        uuid = "${openstack_networking_network_v2.vpn.id}"
+        uuid = "${openstack_networking_network_v2.dmz.id}"
     }
 
     depends_on = [
-        "openstack_networking_subnet_v2.vpn"
+        "openstack_networking_subnet_v2.dmz"
     ]
 
 }
 
 resource "openstack_compute_floatingip_associate_v2" "myip" {
     floating_ip = "${openstack_networking_floatingip_v2.floatip.address}"
-    instance_id = "${openstack_compute_instance_v2.vpn.id}"
-    fixed_ip = "${openstack_compute_instance_v2.vpn.network.0.fixed_ip_v4}"
+    instance_id = "${openstack_compute_instance_v2.dmz.id}"
+    fixed_ip = "${openstack_compute_instance_v2.dmz.network.0.fixed_ip_v4}"
 }
 
 #        _           _
@@ -80,26 +80,26 @@ resource "openstack_compute_instance_v2" "gluster" {
     ]
 }
 
-resource "openstack_compute_instance_v2" "compute" {
+resource "openstack_compute_instance_v2" "app" {
     key_pair = "${var.key_pair_name}"
     name = "${format("${var.environment}-app-%03d", count.index + 1)}"
-    count = "${var.compute_count}"
+    count = "${var.app_count}"
     image_id = "${data.openstack_images_image_v2.centos.id}"
     flavor_id = "${data.openstack_compute_flavor_v2.small.id}"
     security_groups = [
-        "${var.environment}-compute",
+        "${var.environment}-app",
         "${var.environment}-ssh"
     ]
 
     metadata {
-        groups = "gluster-demo,compute"
+        groups = "gluster-demo,app"
     }
 
     network {
-        uuid = "${openstack_networking_network_v2.compute.id}"
+        uuid = "${openstack_networking_network_v2.app.id}"
     }
 
     depends_on = [
-        "openstack_networking_subnet_v2.compute"
+        "openstack_networking_subnet_v2.app"
     ]
 }
