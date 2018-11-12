@@ -64,7 +64,7 @@ python-saharaclient==1.6.0
 python-swiftclient==3.5.0
 pytz==2018.5
 PyYAML==3.12
-requests==2.19.1
+requests
 requestsexceptions==1.4.0
 rfc3986==1.1.0
 shade==1.28.0
