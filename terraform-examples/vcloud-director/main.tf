@@ -1,3 +1,8 @@
+# This code is based on an early version of the vCloud Terraform Provider v2
+# This provider has been completely rewritten, and is evolving rapidly.
+#
+#   -- NOT FOR PRODUCTION USE!!! --
+
 variable "version" {
   default = "0.2"
 }
@@ -316,10 +321,6 @@ resource "vcd_snat" "internal" {
   internal_ip  = "${var.cidr["internal"]}"
 }
 
-output "bastion_ip" {
-  value = "${vcd_vapp_vm.bastion.ip}"
-}
-
-output "openvpn_ip" {
-  value = "${vcd_vapp.openvpn-server.ip}"
+output "public_ip" {
+  value = "${var.public_ip}"
 }
