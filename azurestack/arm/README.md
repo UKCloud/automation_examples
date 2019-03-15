@@ -1,5 +1,7 @@
 # Azure Deployment Example
 
+![Azure Stack](img/azurestack.png)
+
 This Azure Resource Manager (ARM) template will deploy a simple 2-tiered
 infrastructure with load-balancer.  This is suitable for hosting a scaleable,
 highly-available web application with database backend.
