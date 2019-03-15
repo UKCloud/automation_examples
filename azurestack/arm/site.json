@@ -1,0 +1,670 @@
+{
+  "contentVersion": "1.0.0.0", 
+  "parameters": {
+    "environmentName": {
+      "defaultValue": "dev", 
+      "type": "string", 
+      "metadata": {
+        "description": "Name of this deployment environment"
+      }
+    }, 
+    "adminPassword": {
+      "type": "secureString", 
+      "metadata": {
+        "description": "Password for admin login"
+      }
+    }, 
+    "webServers": {
+      "type": "array"
+    }, 
+    "resourceGroupName": {
+      "type": "string", 
+      "metadata": {
+        "description": "The Resource Group containing the vnet, other infrastructure. This is NOT necessarily the deployment resource group.\n"
+      }
+    }, 
+    "adminUsername": {
+      "type": "string", 
+      "metadata": {
+        "description": "Username for admin login"
+      }
+    }, 
+    "webSubnetName": {
+      "type": "string", 
+      "metadata": {
+        "description": "Name of the subnet to be used for web servers"
+      }
+    }, 
+    "storageAccountType": {
+      "defaultValue": "Standard_LRS", 
+      "allowedValues": [
+        "Standard_LRS", 
+        "Premium_LRS"
+      ], 
+      "type": "string", 
+      "metadata": {
+        "description": "Type of storage account"
+      }
+    }, 
+    "vmSizes": {
+      "defaultValue": {
+        "small": "Standard_A1_v2", 
+        "large": "Standard_A8_v2", 
+        "medium": "Standard_A2_v2"
+      }, 
+      "type": "object"
+    }, 
+    "dbNetworkPrefix": {
+      "type": "string", 
+      "metadata": {
+        "description": "Network address of DB subnet (CIDR format)"
+      }
+    }, 
+    "dbSubnetName": {
+      "type": "string", 
+      "metadata": {
+        "description": "Name of the Subnet for DB servers"
+      }
+    }, 
+    "sshIPAllocationMethod": {
+      "defaultValue": "Dynamic", 
+      "allowedValues": [
+        "Dynamic", 
+        "Static"
+      ], 
+      "type": "string", 
+      "metadata": {
+        "description": "How the IP address is allocated"
+      }
+    }, 
+    "addressPrefixes": {
+      "type": "string", 
+      "metadata": {
+        "description": "The network address space for subnets in this group. E.g., \"10.1.0.0/16\""
+      }
+    }, 
+    "publicIPAddressName": {
+      "defaultValue": "[concat('public-ip-', uniqueString(resourceGroup().id)))]", 
+      "type": "string"
+    }, 
+    "adminSshKeyData": {
+      "type": "secureString", 
+      "metadata": {
+        "description": "SSH public key for admin login"
+      }
+    }, 
+    "sshIPAddressName": {
+      "defaultValue": "[concat('ssh-public-ip-', uniqueString(resourceGroup().id))]", 
+      "type": "string"
+    }, 
+    "webNetworkPrefix": {
+      "type": "string", 
+      "metadata": {
+        "description": "Network address of subnet (CIDR format)"
+      }
+    }, 
+    "storageAccountName": {
+      "type": "string", 
+      "metadata": {
+        "description": "Storage account to use for the vhd's\n"
+      }
+    }, 
+    "publicIPAllocationMethod": {
+      "defaultValue": "Dynamic", 
+      "allowedValues": [
+        "Dynamic", 
+        "Static"
+      ], 
+      "type": "string", 
+      "metadata": {
+        "description": "How the IP address is allocated"
+      }
+    }, 
+    "dbServers": {
+      "type": "array", 
+      "metadata": {
+        "description": "List of DB servers"
+      }
+    }, 
+    "vNetName": {
+      "type": "string", 
+      "metadata": {
+        "description": "Name of vNet"
+      }
+    }
+  }, 
+  "variables": {
+    "environmentName": "[toUpper(parameters('environmentName'))]", 
+    "webMachineType": "[parameters('vmSizes').small]", 
+    "webNetworkSecurityGroupProperties": {
+      "securityRules": [
+        {
+          "name": "allow-https", 
+          "properties": {
+            "access": "Allow", 
+            "direction": "Inbound", 
+            "protocol": "Tcp", 
+            "description": "Allow port 443", 
+            "priority": 100, 
+            "destinationPortRange": "443", 
+            "sourceAddressPrefix": "*", 
+            "destinationAddressPrefix": "*", 
+            "sourcePortRange": "*"
+          }
+        }, 
+        {
+          "name": "allow-http", 
+          "properties": {
+            "access": "Allow", 
+            "direction": "Inbound", 
+            "protocol": "Tcp", 
+            "description": "Allow port 80", 
+            "priority": 110, 
+            "destinationPortRange": "80", 
+            "sourceAddressPrefix": "*", 
+            "destinationAddressPrefix": "*", 
+            "sourcePortRange": "*"
+          }
+        }, 
+        {
+          "name": "allow-ssh", 
+          "properties": {
+            "access": "Allow", 
+            "direction": "Inbound", 
+            "protocol": "Tcp", 
+            "description": "Allow port 22", 
+            "priority": 120, 
+            "destinationPortRange": 22, 
+            "sourceAddressPrefix": "*", 
+            "destinationAddressPrefix": "*", 
+            "sourcePortRange": "*"
+          }
+        }, 
+        {
+          "name": "allow-dns-out", 
+          "properties": {
+            "access": "Allow", 
+            "direction": "Outbound", 
+            "protocol": "*", 
+            "description": "Allow port 53 out", 
+            "priority": 130, 
+            "destinationPortRange": 53, 
+            "sourceAddressPrefix": "*", 
+            "destinationAddressPrefix": "*", 
+            "sourcePortRange": "*"
+          }
+        }, 
+        {
+          "name": "allow-dns-in", 
+          "properties": {
+            "access": "Allow", 
+            "direction": "Outbound", 
+            "protocol": "*", 
+            "description": "Allow port 53 in", 
+            "priority": 140, 
+            "destinationPortRange": 53, 
+            "sourceAddressPrefix": "*", 
+            "destinationAddressPrefix": "*", 
+            "sourcePortRange": "*"
+          }
+        }
+      ]
+    }, 
+    "bastionMachineType": "[parameters('vmSizes').small]", 
+    "dbNetworkSecurityGroupProperties": {
+      "securityRules": [
+        {
+          "name": "allow-mysql", 
+          "properties": {
+            "access": "Allow", 
+            "direction": "Inbound", 
+            "protocol": "Tcp", 
+            "description": "Allow port 443", 
+            "priority": 150, 
+            "destinationPortRange": 3306, 
+            "sourceAddressPrefix": "[parameters('webNetworkPrefix')]", 
+            "destinationAddressPrefix": "[parameters('dbNetworkPrefix')]", 
+            "sourcePortRange": "*"
+          }
+        }, 
+        {
+          "name": "allow-mysql-internal", 
+          "properties": {
+            "access": "Allow", 
+            "direction": "Inbound", 
+            "protocol": "Tcp", 
+            "description": "Allow port 443", 
+            "priority": 160, 
+            "destinationPortRange": 3306, 
+            "sourceAddressPrefix": "[parameters('dbNetworkPrefix')]", 
+            "destinationAddressPrefix": "[parameters('dbNetworkPrefix')]", 
+            "sourcePortRange": "*"
+          }
+        }
+      ]
+    }, 
+    "dbNetworkRef": "[concat(variables('virtualNetworkRef'),'/subnets/', variables('dbSubnetName'))]", 
+    "publicIPRef": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddressName'))]", 
+    "appMachineType": "[parameters('vmSizes').large]", 
+    "virtualNetworkProperties": {
+      "subnets": [
+        {
+          "name": "[variables('webSubnetName')]", 
+          "properties": {
+            "addressPrefix": "[parameters('webNetworkPrefix')]", 
+            "networkSecurityGroup": {
+              "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('webNetworkSecurityGroupName'))]"
+            }
+          }
+        }, 
+        {
+          "name": "[variables('dbSubnetName')]", 
+          "properties": {
+            "addressPrefix": "[parameters('dbNetworkPrefix')]", 
+            "networkSecurityGroup": {
+              "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('dbNetworkSecurityGroupName'))]"
+            }
+          }
+        }
+      ], 
+      "addressSpace": {
+        "addressPrefixes": [
+          "[parameters('addressPrefixes')]"
+        ]
+      }
+    }, 
+    "loadBalancerName": "[concat(variables('environmentName'), '-LB1')]", 
+    "imageReference": {
+      "sku": "7.5", 
+      "publisher": "OpenLogic", 
+      "version": "7.5.20180815", 
+      "offer": "CentOS"
+    }, 
+    "webSubnetName": "[parameters('webSubnetName')]", 
+    "sshIPRef": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('sshIPAddressName'))]", 
+    "webNetworkRef": "[concat(variables('virtualNetworkRef'),'/subnets/', variables('webSubnetName'))]", 
+    "webAvailabilitySetName": "[concat(variables('environmentName'), '-ASG-WEB')]", 
+    "dbMachineType": "[parameters('vmSizes').medium]", 
+    "virtualNetworkRef": "[resourceId(parameters('resourceGroupName'), 'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]", 
+    "vmStorageAccountContainerName": "[toLower(concat(variables('environmentName'), 'vhds'))]", 
+    "webNetworkSecurityGroupName": "[concat(variables('environmentName'), '-WEB-NSG')]", 
+    "publicIPAddressProperties": {
+      "publicIPAllocationMethod": "[parameters('publicIPAllocationMethod')]", 
+      "dnsSettings": {
+        "domainNameLabel": "[toLower(parameters('publicIPAddressName'))]"
+      }
+    }, 
+    "sshIPAddressProperties": {
+      "publicIPAllocationMethod": "[parameters('sshIPAllocationMethod')]", 
+      "dnsSettings": {
+        "domainNameLabel": "[toLower(parameters('sshIPAddressName'))]"
+      }
+    }, 
+    "storageAccountName": "[toLower(parameters('storageAccountName'))]", 
+    "dbNetworkSecurityGroupName": "[concat(variables('environmentName'), '-DB-NSG')]", 
+    "dbAvailabilitySetName": "[concat(variables('environmentName'), '-ASG-DB')]", 
+    "linuxConfiguration": {
+      "ssh": {
+        "publicKeys": [
+          {
+            "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]", 
+            "keyData": "[parameters('adminSshKeyData')]"
+          }
+        ]
+      }
+    }, 
+    "storageProperties": {
+      "accountType": "[parameters('storageAccountType')]"
+    }, 
+    "virtualNetworkName": "[parameters('vNetName')]", 
+    "dbSubnetName": "[parameters('dbSubnetName')]", 
+    "location": "[resourceGroup().location]"
+  }, 
+  "$schema": "$schema: http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#", 
+  "resources": [
+    {
+      "location": "[variables('location')]", 
+      "type": "Microsoft.Storage/storageAccounts", 
+      "properties": "[variables('storageProperties')]", 
+      "name": "[variables('storageAccountName')]"
+    }, 
+    {
+      "location": "[variables('location')]", 
+      "type": "Microsoft.Network/virtualNetworks", 
+      "properties": "[variables('virtualNetworkProperties')]", 
+      "name": "[variables('virtualNetworkName')]", 
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('webNetworkSecurityGroupName'))]", 
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('dbNetworkSecurityGroupName'))]"
+      ]
+    }, 
+    {
+      "location": "[variables('location')]", 
+      "type": "Microsoft.Network/networkSecurityGroups", 
+      "properties": "[variables('webNetworkSecurityGroupProperties')]", 
+      "name": "[variables('webNetworkSecurityGroupName')]"
+    }, 
+    {
+      "location": "[variables('location')]", 
+      "type": "Microsoft.Network/networkSecurityGroups", 
+      "properties": "[variables('dbNetworkSecurityGroupProperties')]", 
+      "name": "[variables('dbNetworkSecurityGroupName')]"
+    }, 
+    {
+      "location": "[variables('location')]", 
+      "type": "Microsoft.Network/loadBalancers", 
+      "properties": {
+        "frontEndIpConfigurations": [
+          {
+            "name": "frontend-web", 
+            "properties": {
+              "publicIPAddress": {
+                "id": "[variables('publicIPRef')]"
+              }
+            }
+          }
+        ], 
+        "loadBalancingRules": [
+          {
+            "name": "balance-http", 
+            "properties": {
+              "backendAddressPool": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/backendAddressPools/backend-web')]"
+              }, 
+              "frontendIPConfiguration": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/frontendIpConfigurations/frontend-web')]"
+              }, 
+              "protocol": "Tcp", 
+              "frontendPort": 80, 
+              "backendPort": 80, 
+              "probe": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/probes/probe-http')]"
+              }, 
+              "idleTimeoutInMinutes": 15
+            }
+          }, 
+          {
+            "name": "balance-https", 
+            "properties": {
+              "backendAddressPool": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/backendAddressPools/backend-web')]"
+              }, 
+              "frontendIPConfiguration": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/frontendIpConfigurations/frontend-web')]"
+              }, 
+              "protocol": "Tcp", 
+              "frontendPort": 443, 
+              "backendPort": 443, 
+              "probe": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/probes/probe-https')]"
+              }, 
+              "idleTimeoutInMinutes": 15
+            }
+          }
+        ], 
+        "backendAddressPools": [
+          {
+            "name": "backend-web"
+          }
+        ], 
+        "probes": [
+          {
+            "name": "probe-http", 
+            "properties": {
+              "protocol": "Tcp", 
+              "numberOfProbes": 2, 
+              "intervalInSeconds": 15, 
+              "port": 80
+            }
+          }, 
+          {
+            "name": "probe-https", 
+            "properties": {
+              "protocol": "Tcp", 
+              "numberOfProbes": 2, 
+              "intervalInSeconds": 15, 
+              "port": 443
+            }
+          }
+        ]
+      }, 
+      "name": "[variables('loadBalancerName')]", 
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIPAddressName'))]", 
+        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+      ]
+    }, 
+    {
+      "location": "[variables('location')]", 
+      "type": "Microsoft.Network/publicIPAddresses", 
+      "properties": "[variables('publicIPAddressProperties')]", 
+      "name": "[parameters('publicIPAddressName')]"
+    }, 
+    {
+      "location": "[variables('location')]", 
+      "type": "Microsoft.Network/publicIPAddresses", 
+      "properties": "[variables('sshIPAddressProperties')]", 
+      "name": "[parameters('sshIPAddressName')]"
+    }, 
+    {
+      "location": "[variables('location')]", 
+      "type": "Microsoft.Network/networkInterfaces", 
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1", 
+            "properties": {
+              "subnet": {
+                "id": "[variables('webNetworkRef')]"
+              }, 
+              "privateIPAllocationMethod": "Dynamic", 
+              "publicIPAddress": {
+                "id": "[variables('sshIPRef')]"
+              }
+            }
+          }
+        ]
+      }, 
+      "name": "bastion-NIC1", 
+      "dependsOn": [
+        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]"
+      ]
+    }, 
+    {
+      "name": "[concat(parameters('webServers')[copyIndex()][1], '-NIC1')]", 
+      "dependsOn": [
+        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]"
+      ], 
+      "copy": {
+        "count": "[length(parameters('webServers'))]", 
+        "name": "webnicloop"
+      }, 
+      "type": "Microsoft.Network/networkInterfaces", 
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1", 
+            "properties": {
+              "subnet": {
+                "id": "[variables('webNetworkRef')]"
+              }, 
+              "privateIPAllocationMethod": "Dynamic", 
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/backendAddressPools/backend-web')]"
+                }
+              ]
+            }
+          }
+        ]
+      }, 
+      "location": "[variables('location')]"
+    }, 
+    {
+      "name": "[concat(parameters('dbServers')[copyIndex()][1], '-NIC1')]", 
+      "dependsOn": [
+        "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]"
+      ], 
+      "copy": {
+        "count": "[length(parameters('dbServers'))]", 
+        "name": "dbnicloop"
+      }, 
+      "type": "Microsoft.Network/networkInterfaces", 
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1", 
+            "properties": {
+              "subnet": {
+                "id": "[variables('dbNetworkRef')]"
+              }, 
+              "privateIPAllocationMethod": "Dynamic"
+            }
+          }
+        ]
+      }, 
+      "location": "[variables('location')]"
+    }, 
+    {
+      "type": "Microsoft.Compute/availabilitySets", 
+      "name": "[variables('webAvailabilitySetName')]", 
+      "location": "[variables('location')]"
+    }, 
+    {
+      "type": "Microsoft.Compute/availabilitySets", 
+      "name": "[variables('dbAvailabilitySetName')]", 
+      "location": "[variables('location')]"
+    }, 
+    {
+      "location": "[variables('location')]", 
+      "type": "Microsoft.Compute/virtualMachines", 
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('bastionMachineType')]"
+        }, 
+        "storageProfile": {
+          "imageReference": "[variables('imageReference')]", 
+          "osDisk": {
+            "osType": "Linux", 
+            "vhd": {
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob, 'vhds/', 'bastion-osdisk.vhd')]"
+            }, 
+            "createOption": "FromImage", 
+            "name": "osdisk", 
+            "caching": "ReadWrite"
+          }
+        }, 
+        "osProfile": {
+          "adminUsername": "[parameters('adminUsername')]", 
+          "computerName": "bastion", 
+          "linuxConfiguration": "[variables('linuxConfiguration')]", 
+          "adminPassword": "[parameters('adminPassword')]"
+        }, 
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', 'bastion-NIC1')]"
+            }
+          ]
+        }
+      }, 
+      "name": "bastion", 
+      "dependsOn": [
+        "Microsoft.Network/networkInterfaces/bastion-NIC1"
+      ]
+    }, 
+    {
+      "name": "[parameters('webServers')[copyIndex()][1]]", 
+      "dependsOn": [
+        "webnicloop", 
+        "[concat('Microsoft.Compute/availabilitySets/', variables('webAvailabilitySetName'))]"
+      ], 
+      "copy": {
+        "count": "[length(parameters('webServers'))]", 
+        "name": "webMachineLoop"
+      }, 
+      "type": "Microsoft.Compute/virtualMachines", 
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('webMachineType')]"
+        }, 
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('webAvailabilitySetName'))]"
+        }, 
+        "osProfile": {
+          "adminUsername": "[parameters('adminUsername')]", 
+          "computerName": "[parameters('webServers')[copyIndex()][1]]", 
+          "linuxConfiguration": "[variables('linuxConfiguration')]", 
+          "adminPassword": "[parameters('adminPassword')]"
+        }, 
+        "storageProfile": {
+          "imageReference": "[variables('imageReference')]", 
+          "osDisk": {
+            "osType": "Linux", 
+            "vhd": {
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob, 'vhds/', parameters('webServers')[copyIndex()][1], '-osdisk.vhd')]"
+            }, 
+            "createOption": "FromImage", 
+            "name": "osdisk", 
+            "caching": "ReadWrite"
+          }
+        }, 
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('webServers')[copyIndex()][1],'-NIC1'))]"
+            }
+          ]
+        }
+      }, 
+      "location": "[variables('location')]"
+    }, 
+    {
+      "name": "[parameters('dbServers')[copyIndex()][1]]", 
+      "dependsOn": [
+        "dbnicloop", 
+        "[concat('Microsoft.Compute/availabilitySets/', variables('dbAvailabilitySetName'))]"
+      ], 
+      "copy": {
+        "count": "[length(parameters('dbServers'))]", 
+        "name": "dbMachineLoop"
+      }, 
+      "type": "Microsoft.Compute/virtualMachines", 
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('dbMachineType')]"
+        }, 
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('dbAvailabilitySetName'))]"
+        }, 
+        "osProfile": {
+          "adminUsername": "[parameters('adminUsername')]", 
+          "computerName": "[parameters('dbServers')[copyIndex()][1]]", 
+          "linuxConfiguration": "[variables('linuxConfiguration')]", 
+          "adminPassword": "[parameters('adminPassword')]"
+        }, 
+        "storageProfile": {
+          "imageReference": "[variables('imageReference')]", 
+          "osDisk": {
+            "osType": "Linux", 
+            "vhd": {
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob, 'vhds/', parameters('dbServers')[copyIndex()][1], '-osdisk.vhd')]"
+            }, 
+            "createOption": "FromImage", 
+            "name": "osdisk", 
+            "caching": "ReadWrite"
+          }
+        }, 
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('dbServers')[copyIndex()][1],'-NIC1'))]"
+            }
+          ]
+        }
+      }, 
+      "location": "[variables('location')]"
+    }
+  ], 
+  "apiProfile": "2018-03-01-hybrid"
+}

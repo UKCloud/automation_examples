@@ -1,0 +1,45 @@
+$schema: "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#"
+contentVersion: "1.0.0.0"
+parameters:
+    adminSshKeyData:
+        value: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCb6/uiDDrXBhXNa+5inWKU5Y3tfvEzeomAhU2nKK1USqY/oeOvTtXwzjYcTZhO1ZvgKsdlptQZQ5lqs5PNg0KEBn2rJ/Z1q7TQvbciH/HTcTLbW2i2EgRFjK4BRCTRAZaoT4IJlPszM+Vax52ouuDvdpzxFHLpgfNMn52c5uSpfXUbgOIjkU2U4jn6MAkG4dILZnI307JMrpzsGTRY1d1OIqI+/4ag6/B4HQFxK3RLP0EyxSS53tHJc7U+xrt5g92vl2G8kuF8LCdKZ1uRhy9G8QArNtzbYI9KHF5p/zVmVixFwigu1Bbq5ty8YhDCUqyDZQrb686VM/RQkXri6z5N ewilliams@SED00290.internal.local
+    environmentName:
+        value: dev-webapp
+    publicIpAddressName:
+        value: dev-webapp-proto
+    addressPrefixes:
+        value: "192.168.0.0/16"
+    webNetworkPrefix:
+        value: "192.168.1.0/24"
+    dbNetworkPrefix:
+        value: "192.168.2.0/24"
+    resourceGroupName:
+        value: rg-dev-webapp
+    adminUsername:
+        value: centos
+    adminPassword:
+        value: xe9aeY8I
+    storageAccountName:
+        value: "devwebappstorage"
+    dbServers:
+        value:
+            -
+                - 192.168.2.1
+                - dev-webapp-db1
+            -
+                - 192.168.2.2
+                - dev-webapp-db2
+    webServers:
+        value:
+            -
+                - 192.168.1.1
+                - dev-webapp-web1
+            -
+                - 192.168.1.2
+                - dev-webapp-web2
+    dbSubnetName:
+        value: DEV-WEBAPP-DB
+    webSubnetName:
+        value: DEV-WEBAPP-WEB
+    vNetName:
+        value: DEV-WEBAPP-VNET
