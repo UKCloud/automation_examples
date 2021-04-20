@@ -1,4 +1,4 @@
-ansible==2.5.0
+ansible==2.9.20
 appdirs==1.4.3
 asn1crypto==0.24.0
 Babel==2.6.0
