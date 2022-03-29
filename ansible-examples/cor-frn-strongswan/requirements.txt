@@ -44,7 +44,7 @@ oslo.log==3.39.0
 oslo.serialization==2.27.0
 oslo.utils==3.36.3
 packaging==17.1
-paramiko==2.4.1
+paramiko==2.10.1
 pbr==4.0.4
 prettytable==0.7.2
 pyasn1==0.4.3
